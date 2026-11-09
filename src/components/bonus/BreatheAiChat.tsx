@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Sparkles, 
   Send, 
@@ -31,7 +31,45 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [language, setLanguage] = useState('Auto');
+  const [isClosing, setIsClosing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleClose = useCallback(() => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 260);
+  }, [isClosing, onClose]);
+
+  // Handle ESC key to dismiss
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleClose]);
+
+  // Touch handlers for mobile drag-down dismiss
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diffY = touchEndY - touchStartY.current;
+    if (diffY > 60) {
+      handleClose();
+    }
+    touchStartY.current = null;
+  };
 
   useEffect(() => {
     if (messages.length === 0 && currentData) {
@@ -127,20 +165,30 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
   return (
     <div
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) handleClose();
       }}
-      className="chat-dialog-shell fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-[#173D32]/75 backdrop-blur-sm animate-fadeIn overscroll-contain"
+      className={`chat-dialog-shell fixed inset-0 z-50 flex items-end justify-center p-0 sm:p-4 bg-[#173D32]/75 backdrop-blur-sm overflow-hidden touch-pan-y ${
+        isClosing ? 'animate-chat-backdrop-out' : 'animate-chat-backdrop-in'
+      }`}
     >
-      <div className="chat-dialog relative w-full h-[100dvh] sm:h-[620px] max-h-[100dvh] sm:max-h-[88vh] sm:max-w-xl bg-[#F7F5ED] border-0 sm:border sm:border-[#E3E6DC] rounded-none sm:rounded-3xl shadow-card flex flex-col overflow-hidden animate-enter">
+      <div
+        className={`chat-dialog relative w-full max-w-full sm:max-w-xl bg-[#F7F5ED] border-0 sm:border sm:border-[#E3E6DC] rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col h-[100dvh] sm:h-[640px] max-h-[100dvh] sm:max-h-[90vh] overflow-hidden overflow-x-hidden ${
+          isClosing ? 'animate-chat-close' : 'animate-chat-open'
+        }`}
+      >
         
         {/* Dark Forest Green Header: Nature × AI Technology */}
-        <div className="p-3 sm:p-4 bg-[#173D32] text-[#F7F5ED] border-b border-[#245543]">
+        <div
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          className="p-3 sm:p-4 bg-[#173D32] text-[#F7F5ED] border-b border-[#245543] flex-shrink-0 cursor-grab active:cursor-grabbing select-none"
+        >
           {/* Mobile swipe/drag affordance indicator */}
-          <div className="sm:hidden w-10 h-1 bg-white/30 rounded-full mx-auto mb-2" />
+          <div className="sm:hidden w-12 h-1.5 bg-white/30 rounded-full mx-auto mb-2.5 transition-opacity hover:opacity-80" />
 
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 max-w-full">
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#245543] border border-[#A8B99A]/40 flex items-center justify-center text-[#65B9C9] flex-shrink-0">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#245543] border border-[#A8B99A]/40 flex items-center justify-center text-[#65B9C9] flex-shrink-0 shadow-inner">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -179,7 +227,7 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
                 <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="p-1.5 sm:p-2 rounded-lg text-[#A8B99A] hover:text-white hover:bg-[#245543] transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
                 title="Close chat"
                 aria-label="Close chat"
@@ -190,88 +238,96 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* Message Thread */}
-        <div className="chat-thread flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#F7F5ED] overscroll-contain">
+        {/* Thread Container with FIXED Background Canvas (Does NOT scroll) */}
+        <div className="chat-canvas-wrapper relative flex-1 min-h-0 w-full overflow-hidden bg-[#F7F5ED]">
+          {/* Static fixed background image layer: does NOT scroll with messages */}
           <div className="chat-thread-art" aria-hidden="true" />
-          {messages.map((msg) => {
-            const isUser = msg.sender === 'user';
-            return (
-              <div
-                key={msg.id}
-                className={`flex gap-2 sm:gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
-              >
-                {!isUser && (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF1E8] text-[#173D32] border border-[#E3E6DC] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Leaf className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#2D6A4F]" />
-                  </div>
-                )}
+          <div className="chat-thread-ambient" aria-hidden="true" />
 
-                <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 text-xs leading-relaxed break-words ${
-                  isUser
-                    ? 'bg-[#173D32] text-[#F7F5ED] font-medium shadow-soft'
-                    : 'bg-white border border-[#E3E6DC] text-[#26332D] shadow-soft'
-                }`}>
-                  <div className="relative whitespace-pre-line">{msg.text.replace(/\*\*/g, '').replace(/\\([*_])/g, '$1')}</div>
+          {/* Scrollable message thread: scrolls smoothly over the fixed background */}
+          <div className="chat-thread relative z-10 h-full w-full overflow-y-auto overflow-x-hidden p-3.5 sm:p-4 space-y-3.5 overscroll-contain">
+            {messages.map((msg) => {
+              const isUser = msg.sender === 'user';
+              return (
+                <div
+                  key={msg.id}
+                  className={`flex gap-2 sm:gap-2.5 max-w-full ${isUser ? 'justify-end' : 'justify-start'}`}
+                >
+                  {!isUser && (
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF1E8] text-[#173D32] border border-[#E3E6DC] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Leaf className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#2D6A4F]" />
+                    </div>
+                  )}
 
-                  <div className={`mt-2 flex items-center justify-between text-[10px] ${isUser ? 'text-[#A8B99A]' : 'text-[#89938A]'}`}>
-                    <span>{msg.timestamp}</span>
-                    {!isUser && (
-                      <button
-                        onClick={() => handleSpeak(msg.text)}
-                        className="hover:text-[#173D32] flex items-center gap-1 ml-2 transition-colors p-1"
-                        title="Voice readout"
-                        aria-label="Voice readout"
-                      >
-                        {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-[#8B5E3C]" /> : <Volume2 className="w-3.5 h-3.5" />}
-                      </button>
+                  <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 text-xs leading-relaxed break-words [overflow-wrap:anywhere] ${
+                    isUser
+                      ? 'bg-[#173D32] text-[#F7F5ED] font-medium shadow-soft'
+                      : 'bg-white border border-[#E3E6DC] text-[#26332D] shadow-soft'
+                  }`}>
+                    <div className="relative whitespace-pre-line break-words [overflow-wrap:anywhere]">
+                      {msg.text.replace(/\*\*/g, '').replace(/\\([*_])/g, '$1')}
+                    </div>
+
+                    <div className={`mt-2 flex items-center justify-between text-[10px] ${isUser ? 'text-[#A8B99A]' : 'text-[#89938A]'}`}>
+                      <span>{msg.timestamp}</span>
+                      {!isUser && (
+                        <button
+                          onClick={() => handleSpeak(msg.text)}
+                          className="hover:text-[#173D32] flex items-center gap-1 ml-2 transition-colors p-1"
+                          title="Voice readout"
+                          aria-label="Voice readout"
+                        >
+                          {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-[#8B5E3C]" /> : <Volume2 className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                    </div>
+
+                    {msg.suggestions && (
+                      <div className="mt-2.5 pt-2.5 border-t border-[#E3E6DC] flex flex-wrap gap-1.5 w-full">
+                        {msg.suggestions.map((chip, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSendMessage(chip)}
+                            className="px-2.5 py-1 text-[11px] rounded-lg bg-[#EEF1E8] hover:bg-[#A8B99A]/30 text-[#173D32] border border-[#E3E6DC] transition-colors text-left font-medium max-w-full break-words whitespace-normal leading-snug"
+                          >
+                            {chip}
+                          </button>
+                        ))}
+                      </div>
                     )}
                   </div>
 
-                  {msg.suggestions && (
-                    <div className="mt-2.5 pt-2.5 border-t border-[#E3E6DC] flex flex-wrap gap-1.5">
-                      {msg.suggestions.map((chip, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSendMessage(chip)}
-                          className="px-2.5 py-1 text-[11px] rounded-lg bg-[#EEF1E8] hover:bg-[#A8B99A]/30 text-[#173D32] border border-[#E3E6DC] transition-colors text-left font-medium"
-                        >
-                          {chip}
-                        </button>
-                      ))}
+                  {isUser && (
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#245543] text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#A8B99A]" />
                     </div>
                   )}
                 </div>
+              );
+            })}
 
-                {isUser && (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#245543] text-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#A8B99A]" />
-                  </div>
-                )}
+            {isTyping && (
+              <div className="flex gap-2 items-center text-xs text-[#58645C] max-w-full">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF1E8] flex items-center justify-center flex-shrink-0">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#173D32]" />
+                </div>
+                <div className="bg-white p-2.5 sm:p-3 rounded-2xl border border-[#E3E6DC] text-[#58645C] shadow-soft break-words">
+                  Analyzing sensor telemetry...
+                </div>
               </div>
-            );
-          })}
-
-          {isTyping && (
-            <div className="flex gap-2 items-center text-xs text-[#58645C]">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF1E8] flex items-center justify-center flex-shrink-0">
-                <Loader2 className="w-4 h-4 animate-spin text-[#173D32]" />
-              </div>
-              <div className="bg-white p-2.5 sm:p-3 rounded-2xl border border-[#E3E6DC] text-[#58645C] shadow-soft">
-                Analyzing sensor telemetry...
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
 
         {/* Input Bar with Safe Area Inset Support */}
-        <div className="p-2.5 sm:p-3.5 bg-white border-t border-[#E3E6DC] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="p-2.5 sm:p-3.5 bg-white border-t border-[#E3E6DC] pb-[max(0.75rem,env(safe-area-inset-bottom))] flex-shrink-0 w-full overflow-hidden">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage(inputText);
             }}
-            className="flex items-center gap-1.5 sm:gap-2"
+            className="flex items-center gap-1.5 sm:gap-2 w-full max-w-full"
           >
             <button
               type="button"
@@ -292,7 +348,7 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Ask about air quality, masks, plans..."
-              className="flex-1 min-w-0 text-xs sm:text-sm px-3 py-2 sm:px-3.5 sm:py-2.5 bg-[#F7F5ED] border border-[#E3E6DC] rounded-xl text-[#26332D] placeholder-[#89938A] focus:outline-none focus:border-[#173D32] focus:ring-1 focus:ring-[#173D32]/20"
+              className="flex-1 min-w-0 w-full text-xs sm:text-sm px-3 py-2 sm:px-3.5 sm:py-2.5 bg-[#F7F5ED] border border-[#E3E6DC] rounded-xl text-[#26332D] placeholder-[#89938A] focus:outline-none focus:border-[#173D32] focus:ring-1 focus:ring-[#173D32]/20"
             />
 
             <button

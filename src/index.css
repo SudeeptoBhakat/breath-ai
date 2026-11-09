@@ -383,38 +383,167 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 .footer-atmosphere:hover .footer-atmosphere-image { transform: scale(1.045); transition: transform 1.2s ease; }
 
-.chat-thread { position: relative; isolation: isolate; }
+/* AI Chat Bottom-to-Up Animation & Fixed Atmosphere System */
+.chat-dialog-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden !important;
+  touch-action: pan-y;
+  background-color: rgba(23, 61, 50, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.chat-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  will-change: transform, opacity;
+}
+
+@media (min-width: 640px) {
+  .chat-dialog {
+    max-width: 36rem; /* 576px / max-w-xl */
+    margin-bottom: 1.5rem;
+    border-radius: 1.5rem;
+  }
+}
+
+@keyframes chatSlideUp {
+  0% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes chatSlideDown {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0.85;
+  }
+}
+
+@keyframes chatFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes chatFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.animate-chat-open {
+  animation: chatSlideUp 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-chat-close {
+  animation: chatSlideDown 260ms cubic-bezier(0.3, 0, 0.8, 0.15) forwards;
+}
+
+.animate-chat-backdrop-in {
+  animation: chatFadeIn 300ms ease-out forwards;
+}
+
+.animate-chat-backdrop-out {
+  animation: chatFadeOut 260ms ease-in forwards;
+}
+
+/* Fixed background image canvas for the AI chat */
+.chat-canvas-wrapper {
+  position: relative;
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  background-color: #F7F5ED;
+}
+
 .chat-thread-art {
   position: absolute;
-  z-index: 0;
   inset: 0;
-  opacity: .20;
+  z-index: 0;
+  opacity: .22;
   pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(247,245,237,.72), rgba(247,245,237,.92)),
-    url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=600&q=65') center / cover;
+  background-image:
+    linear-gradient(180deg, rgba(247,245,237,.76), rgba(247,245,237,.94)),
+    url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=900&q=70');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
-.chat-thread::after {
-  content: '';
+
+.chat-thread-ambient {
   position: absolute;
   z-index: 0;
-  width: 260px;
-  height: 260px;
-  right: -95px;
-  bottom: -90px;
+  width: 280px;
+  height: 280px;
+  right: -80px;
+  bottom: -60px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(101,185,201,.22), transparent 68%);
-  filter: blur(4px);
+  background: radial-gradient(circle, rgba(101,185,201,.25), transparent 68%);
+  filter: blur(8px);
+  pointer-events: none;
   animation: chatAmbient 8s ease-in-out infinite;
 }
-.chat-thread > :not(.chat-thread-art) { position: relative; z-index: 1; }
+
+.chat-thread {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chat-dialog,
+.chat-thread,
+.chat-thread * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 @keyframes chatAmbient {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: .7; }
   50% { transform: translate3d(-18px, -16px, 0) scale(1.12); opacity: 1; }
 }
-.theme-dark .chat-thread-art { opacity: .13; background: linear-gradient(180deg, rgba(9,29,21,.88), rgba(9,29,21,.95)), url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=600&q=65') center / cover; }
-.theme-dark .chat-thread::after { background: radial-gradient(circle, rgba(101,185,201,.17), transparent 68%); }
-@media (prefers-reduced-motion: reduce) { .chat-thread::after { animation: none; } }
+
+.theme-dark .chat-canvas-wrapper {
+  background-color: #0d1e17 !important;
+}
+
+.theme-dark .chat-thread-art {
+  opacity: .14;
+  background-image:
+    linear-gradient(180deg, rgba(9,29,21,.88), rgba(9,29,21,.95)),
+    url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=900&q=70');
+}
+
+.theme-dark .chat-thread-ambient {
+  background: radial-gradient(circle, rgba(101,185,201,.18), transparent 68%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-thread-ambient { animation: none; }
+  .animate-chat-open, .animate-chat-close { animation-duration: 1ms !important; }
+}
 
 /* Responsive production pass: preserve hierarchy and touch comfort at every width. */
 @media (max-width: 767px) {
@@ -434,8 +563,8 @@ button:focus-visible, a:focus-visible, input:focus-visible {
   .map-search-control { top: .75rem !important; left: .75rem !important; width: calc(100% - 1.5rem) !important; }
   .map-explorer-canvas { height: 480px !important; border-radius: 20px !important; }
   .leaflet-control-zoom { margin-top: 4.25rem !important; }
-  .chat-dialog-shell { padding: 0 !important; align-items: stretch !important; }
-  .chat-dialog { height: 100dvh !important; max-height: 100dvh !important; border-radius: 0 !important; width: 100% !important; }
+  .chat-dialog-shell { padding: 0 !important; align-items: flex-end !important; }
+  .chat-dialog { height: 100dvh !important; max-height: 100dvh !important; border-radius: 20px 20px 0 0 !important; width: 100% !important; margin-bottom: 0 !important; }
   .health-visual-callout { min-height: 220px; }
   .health-guidance-grid { margin-top: 1.25rem !important; }
   .health-guidance-grid::before { left: 8%; right: 8%; }
