@@ -19,7 +19,7 @@ export interface WaqiStationData {
   };
 }
 
-export const WAQI_TOKEN = (import.meta as any).env?.VITE_WAQI_TOKEN || '61db13bd96ce9064cf660e50aca7803d77ff2b1e';
+export const WAQI_TOKEN = (import.meta as any).env?.VITE_WAQI_TOKEN || '';
 
 /**
  * Returns the authentic WAQI Tile Layer URL for Leaflet
