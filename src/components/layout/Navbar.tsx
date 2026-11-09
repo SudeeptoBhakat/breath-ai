@@ -25,6 +25,8 @@ import {
 import { useAirQuality, ActiveTab } from '../../context/AirQualityContext';
 import { searchLocations, PRESET_CITIES } from '../../services/geocodingService';
 import { LocationData } from '../../types/aqi';
+import { useLanguage } from '../../context/LanguageContext';
+import { LanguageSelector } from './LanguageSelector';
 
 interface NavbarProps {
   onOpenAiChat: () => void;
@@ -52,6 +54,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     isFavorite,
     toggleFavorite
   } = useAirQuality();
+
+  const { t } = useLanguage();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<LocationData[]>([]);
@@ -100,10 +104,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navTabs: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'dashboard',  label: 'Overview',              icon: <Activity className="w-4 h-4" /> },
-    { id: 'history',    label: 'Air patterns',          icon: <TrendingUp className="w-4 h-4" /> },
-    { id: 'comparison', label: 'Compare & rankings',    icon: <Layers className="w-4 h-4" /> },
-    { id: 'health',     label: 'Health & escapes',      icon: <HeartPulse className="w-4 h-4" /> },
+    { id: 'dashboard',  label: t('nav.overview'),    icon: <Activity className="w-4 h-4" /> },
+    { id: 'history',    label: t('nav.patterns'),    icon: <TrendingUp className="w-4 h-4" /> },
+    { id: 'comparison', label: t('nav.comparison'),  icon: <Layers className="w-4 h-4" /> },
+    { id: 'health',     label: t('nav.health'),      icon: <HeartPulse className="w-4 h-4" /> },
   ];
 
   return (
@@ -135,7 +139,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 value={searchQuery}
                 onChange={handleSearchChange}
                 onFocus={() => { if (searchResults.length > 0 || searchQuery.length === 0) setIsOpenDropdown(true); }}
-                placeholder="Search a city or station"
+                placeholder={t('nav.searchPlaceholder')}
                 className="w-full pl-10 pr-9 py-2.5 text-xs sm:text-sm bg-white text-[#26332D] placeholder-[#89938A] border border-[#E3E6DC] rounded-lg shadow-soft focus:outline-none focus:border-[#173D32] focus:ring-1 focus:ring-[#173D32]/20 transition-all"
               />
               {searchQuery && (
@@ -207,7 +211,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={() => locateMe()}
               disabled={isLocating}
-              title="Detect my current location"
+              title={t('nav.locate')}
               className="p-2.5 sm:px-3 sm:py-2.5 text-xs font-medium rounded-lg bg-white hover:bg-[#EEF1E8] text-[#26332D] border border-[#E3E6DC] transition-colors flex items-center gap-1.5 disabled:opacity-50"
             >
               {isLocating ? (
@@ -215,13 +219,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               ) : (
                 <Navigation className="w-4 h-4 text-[#173D32]" />
               )}
-              <span className="hidden lg:inline text-[#26332D]">Locate</span>
+              <span className="hidden lg:inline text-[#26332D] font-heading">{t('nav.locate')}</span>
             </button>
 
             {/* Favorite Bookmark */}
             <button
               onClick={toggleFavorite}
-              title={isFavorite ? 'Remove from saved' : 'Save location'}
+              title={isFavorite ? t('nav.saved') : t('nav.saveLocation')}
               className="hidden sm:block p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors"
             >
               {isFavorite ? (
@@ -234,7 +238,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Alerts */}
             <button
               onClick={onOpenAlertModal}
-              title="Smart AQI Alerts"
+              title={t('nav.alerts')}
               className="p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors"
             >
               <Bell className="w-4 h-4" />
@@ -243,16 +247,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Share Card */}
             <button
               onClick={onOpenShareModal}
-              title="Export report card"
+              title={t('nav.share')}
               className="hidden sm:block p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors"
             >
               <Share2 className="w-4 h-4" />
             </button>
 
+            {/* Language Selector */}
+            <LanguageSelector />
+
+            {/* Theme Toggle */}
             <button
               onClick={onToggleTheme}
-              title={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
-              aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
+              title={theme === 'light' ? t('nav.themeDark') : t('nav.themeLight')}
+              aria-label={theme === 'light' ? t('nav.themeDark') : t('nav.themeLight')}
               className="p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-all hover:-translate-y-0.5"
             >
               {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
@@ -261,10 +269,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Primary Forest Green CTA Button */}
             <button
               onClick={onOpenAiChat}
-              className="ml-0 sm:ml-1 px-2.5 sm:px-3.5 py-2.5 text-xs font-semibold rounded-lg bg-[#173D32] hover:bg-[#245543] text-[#F7F5ED] transition-colors flex items-center gap-2"
+              className="ml-0 sm:ml-1 px-2.5 sm:px-3.5 py-2.5 text-xs font-semibold rounded-lg bg-[#173D32] hover:bg-[#245543] text-[#F7F5ED] transition-colors flex items-center gap-2 shadow-soft"
             >
               <Sparkles className="w-3.5 h-3.5 text-[#65B9C9]" />
-              <span className="hidden sm:inline font-heading">Ask BreatheAI</span>
+              <span className="hidden sm:inline font-heading">{t('nav.askAi')}</span>
             </button>
           </div>
 

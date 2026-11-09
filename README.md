@@ -1,175 +1,371 @@
-# 🪔 BreatheBetter (PranaAir) — Real-Time Air Quality Intelligence Platform
-> **Theme:** Technology for Cleaner Air — *Breathe Better, Build Smarter*  
-> **Challenge:** LETS CODE DIWALI CHALLENGE 2026 🪔  
-> **Submission URL:** [Lets Code Google Form](https://forms.gle/8ck7stXe8W61U2t88)
+<div align="center">
+
+<img src="src/logo.png" alt="BreatheAI Logo" width="80" />
+
+# BreatheAI
+
+**Production-grade real-time air quality intelligence — engineered for South Asian and global cities.**
+
+[![Live Demo](https://img.shields.io/badge/Live-breath--ai--six.vercel.app-10b981?style=flat-square&logo=vercel)](https://breath-ai-six.vercel.app/)
+[![Build](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](#)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178c6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.3-61dafb?style=flat-square&logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-6.1-646cff?style=flat-square&logo=vite)](https://vitejs.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
+
+[Live Demo](https://breath-ai-six.vercel.app/) · [Architecture](#architecture) · [Quick Start](#quick-start) · [Contributing](#contributing)
+
+</div>
 
 ---
 
-## 🌟 Overview
-**BreatheBetter** is a production-grade, full-stack Air Quality Intelligence Platform designed to empower citizens, vulnerable health groups, and environmental researchers with actionable, real-time air quality telemetry.
+## Overview
 
-During Diwali and the post-monsoon winter transition, severe particulate accumulation, thermal boundary-layer inversions, and celebratory emissions create life-threatening smog hotspots across urban centers. BreatheBetter transforms complex atmospheric chemistry data into clear, life-saving visual insights.
+BreatheAI is a **React + TypeScript** single-page application that delivers real-time air quality intelligence, 7-day history, 5-day forecasting, clinical health advisories, and an AI-powered conversational companion — all backed by authentic ground sensor telemetry.
 
----
+### Key Features
 
-## 🚀 Key Highlights & Architectural Strengths
-
-- **100% Authentic Public Telemetry:** Zero synthetic or mock data. Powered by European **Copernicus Atmosphere Monitoring Service (CAMS)**, **NOAA Global Forecast System (GFS)** via Open-Meteo, and **WAQI / CPCB** ground monitoring stations.
-- **Geospatial Intelligence:** Interactive OpenStreetMap/CartoDB map with dynamic color-coded SVG station pins, coordinate sampling, and pollution hotspot filters.
-- **AI-Powered Environmental Assistant (BreatheAI):** Context-aware conversational AI that ingests live telemetry and answers questions via speech-to-text and text-to-speech.
-- **Predictive ML Analytics:** Auto-regressive exponential smoothing with diurnal cycle weighting (12-hour trajectory) and statistical Z-Score anomaly detection ($Z > 2.0\sigma$).
-- **Diwali 2026 Special Module:** Smog dispersion physics, N95 vs surgical mask filtration breakdown, and eco-celebration safeguards.
-- **Universal Zero-Cost Cloud Stack:** React 19, TypeScript, Tailwind CSS, Leaflet, Recharts, and Supabase (PostgreSQL) with instant offline-first fallback. Ready for free 1-click deployment on **Vercel** or **Netlify**.
-
----
-
-## 📋 Features Checklist (100% Implemented)
-
-### ✅ Mandatory Features (Section 3)
-| Feature | Implementation Details | Status |
-| :--- | :--- | :---: |
-| **A. Live AQI Dashboard** | Real-time US EPA & Indian CPCB AQI (0–500 scale), color-coded severity badges, full pollutant telemetry (PM2.5, PM10, $\text{NO}_2$, $\text{SO}_2$, $\text{CO}$, $\text{O}_3$, Dust, UV Index), exact last-updated timestamp, and data source badges. | ✅ Done |
-| **B. Interactive Air Quality Map** | Leaflet + React-Leaflet interactive map with custom color-coded station pins, coordinate click-sampling, reverse geocoding, and pollution hotspot toggle. | ✅ Done |
-| **C. Historical Pollution Tracker** | 24h, 48h, and 7-day historical curves, PM2.5 vs PM10 correlation charts, daily pollution aggregates, rate-of-change percentages ($\pm\%$), and automated spike detection with meteorological reasoning. | ✅ Done |
-| **D. Location Comparison** | Side-by-side comparator for 2 to 4 global cities, difference metrics, grouped pollutant bar charts, and automated **"Clean Air Winner 🏆"** badge designation. | ✅ Done |
-| **E. Health & Safety Dashboard** | Actionable lifestyle advisories for outdoor cardio, home window ventilation, certified N95 respirators, and HEPA purifiers. Dedicated guides for children, asthmatics, and elderly. Complete AQI spectrum table. | ✅ Done |
-| **F. AQI Forecast** | 72-hour to 5-day hourly atmospheric chemistry forecast (CAMS/NOAA), diurnal cycle visualization (morning smog peak vs afternoon solar mixing), and clear visual distinction between simulated forecasts and ground telemetry. | ✅ Done |
-
-### 🚀 Bonus Features (Section 4 - All 13 Implemented!)
-| Bonus Feature | Implementation Details | Status |
-| :--- | :--- | :---: |
-| **1. AI AQI Assistant (BreatheAI)** | Context-aware AI chatbot understanding current city telemetry, with pre-configured health prompts and Gemini 1.5 Flash support. | ✅ Done |
-| **2. Smart AQI Alerts** | User-defined threshold notifications with Web Audio synthesized chime and browser Push Notifications API. | ✅ Done |
-| **3. ML-Based Prediction** | Auto-regressive Holt-Winters smoothing model predicting next 12 hours with confidence intervals and weather weighting. | ✅ Done |
-| **4. Anomaly Detection** | Rolling-window Z-Score statistical anomaly detector identifying burst emission events ($Z > 2.0\sigma$). | ✅ Done |
-| **5. Pollution Hotspot Filter** | 1-click map filter isolating severe/hazardous zones. | ✅ Done |
-| **6. Location-Based AQI** | HTML5 Geolocation API with reverse geocoding for instant 1-click "Locate Me" tracking. | ✅ Done |
-| **7. Clean Air Sanctuary Finder** | Scans and ranks regional retreats (hill stations, coastal corridors) with percentage cleaner air calculations. | ✅ Done |
-| **8. AQI Sharing Cards** | High-resolution HTML5 Canvas social card generator exportable to branded PNG for WhatsApp, X (Twitter), and LinkedIn. | ✅ Done |
-| **9. Pollution Leaderboard** | Live global and Indian metro rankings for most polluted vs cleanest cities. | ✅ Done |
-| **10. Voice Assistant** | Web Speech Recognition (voice input) + Web Speech Synthesis (read-aloud response). | ✅ Done |
-| **11. Multi-API Integration** | Open-Meteo Copernicus CAMS/NOAA + WAQI / CPCB ground stations + OpenStreetMap Nominatim. | ✅ Done |
-| **12. Micro-Meteorology Context** | Explains thermal inversion risk, wind speed dispersion thresholds, and humidity binding. | ✅ Done |
-| **13. Cloud Persistence & Offline Sync** | Supabase PostgreSQL schema with seamless LocalStorage offline fallback. | ✅ Done |
+| Feature | Description |
+|---------|-------------|
+| 🌿 **Live AQI Dashboard** | Real-time US AQI from Open-Meteo & WAQI ground stations |
+| 🤖 **BreatheAI Chat** | 6-tier AI failover cascade (Gemini → Groq → Ollama → Llama) |
+| 🗺️ **Interactive Map** | Leaflet + WAQI tile layers with real monitoring station markers |
+| 📊 **Historical Analytics** | 7-day hourly trends, anomaly detection, ML-based 12-hour prediction |
+| 📅 **5-Day Forecast** | Open-Meteo predictive atmospheric data with confidence intervals |
+| 🏥 **Health Advisory** | US EPA + CPCB AQI spectrum with physician-calibrated guidance |
+| 🌤️ **Atmospheric Card** | Google Weather-style card with dynamic sky animations |
+| 🌍 **7 Languages** | English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati |
+| 📤 **Social Sharing** | 1200×630 PNG social card + WhatsApp, X, Facebook, Instagram, Email |
+| ⭐ **Saved Locations** | Supabase DB with localStorage offline fallback |
+| 🔔 **Smart Alerts** | AQI threshold alerts with configurable notifications |
+| 🌙 **Dark / Light Theme** | Persisted theme with CSS custom properties |
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## Architecture
 
 ```
-Frontend:          React 19, TypeScript, Vite
-Styling:           Tailwind CSS, Lucide Icons, Glassmorphism
-Maps:              Leaflet, React-Leaflet, CartoDB Dark Matter / OSM
-Data Visualization: Recharts (Area, Bar, Line, Composed)
-Persistence:       Supabase (PostgreSQL) + LocalStorage Sync
-Speech Engine:     Web Speech API (Recognition + Synthesis)
-Audio Synthesizer: Web Audio API (Chimes)
-Graphics Renderer: HTML5 Canvas 2D Context + Canvas Confetti
-APIs Integrated:   Open-Meteo Air Quality, Open-Meteo Geocoding, Open-Meteo Forecast, WAQI, OSM Nominatim
-Hosting:           Vercel / Netlify / GitHub Pages (100% Free)
+src/
+├── App.tsx                          # Root: provider tree, tab routing, lazy loading
+├── main.tsx                         # React 18 createRoot entry point
+├── index.css                        # Tailwind base + custom animations + design tokens
+├── vite-env.d.ts                    # ImportMeta.env type declarations
+│
+├── types/
+│   ├── aqi.ts                       # Domain types: AQICategory, PollutantDetail, LocationData…
+│   └── database.ts                  # Supabase table row types
+│
+├── context/
+│   ├── AirQualityContext.tsx        # Global state: location, telemetry, tabs, favorites
+│   ├── AlertContext.tsx             # AQI alert threshold state
+│   └── LanguageContext.tsx          # i18n: language detection, t() helper, persistence
+│
+├── i18n/
+│   └── translations.ts             # 7-language dictionary (en/hi/bn/ta/te/mr/gu)
+│
+├── services/
+│   ├── aiAssistantService.ts        # 6-tier AI cascade: proxy → Gemini → Groq → Ollama → Llama → offline
+│   ├── openMeteoService.ts          # Open-Meteo Air Quality API + 5-min in-memory cache
+│   ├── weatherService.ts            # Open-Meteo Weather API (temperature, humidity, wind)
+│   ├── waqiService.ts               # WAQI station API + map tile URLs
+│   ├── geocodingService.ts          # Open-Meteo geocoding + OSM Nominatim reverse geocode
+│   ├── mlPredictionService.ts       # Exponential smoothing AQI predictor + Z-score anomaly detection
+│   ├── exportService.ts             # Canvas 1200×630 PNG social card generation (cross-browser)
+│   ├── supabaseService.ts           # Supabase CRUD: favorites, alerts, community reports + localStorage fallback
+│   └── speechService.ts            # Web Speech API TTS / STT wrapper
+│
+├── utils/
+│   ├── aqiCalculator.ts             # AQI_CATEGORIES map, getAQICategory(), formatPollutant()
+│   └── formatters.ts                # formatTime(), formatDateShort(), calculatePercentageChange()
+│
+└── components/
+    ├── layout/
+    │   ├── Navbar.tsx               # Sticky header: search, tabs, language selector, theme toggle
+    │   ├── Footer.tsx               # Atmospheric footer with i18n tagline
+    │   ├── LanguageSelector.tsx     # Dropdown language picker with native script labels
+    │   ├── DiwaliBanner.tsx         # Seasonal notification banner (toggled in App.tsx)
+    │   └── ErrorBoundary.tsx        # React class ErrorBoundary — prevents blank-screen crashes
+    ├── dashboard/
+    │   ├── HeroAqiCard.tsx          # Primary AQI hero: live gauge, WHO comparison, quick actions
+    │   ├── PollutantGrid.tsx        # 6-pollutant breakdown grid vs WHO limits
+    │   └── WeatherCard.tsx          # Google Weather-style card with animated sky + clouds
+    ├── analytics/
+    │   ├── HistoricalTracker.tsx    # 7-day hourly chart + anomaly detection table
+    │   └── ForecastView.tsx         # 5-day daily trend chart + 12-hour ML predictions
+    ├── comparison/
+    │   └── LocationComparator.tsx   # Side-by-side multi-city AQI comparison
+    ├── health/
+    │   └── HealthAdvisoryCard.tsx   # Clinical advisories: exercise, masks, purifiers, vulnerable groups
+    ├── map/
+    │   └── AirQualityMap.tsx        # Leaflet interactive map with WAQI overlay
+    └── bonus/
+        ├── BreatheAiChat.tsx        # Full-screen AI chat modal with voice I/O
+        ├── ShareCardModal.tsx       # Social sharing: PNG download + 6 platform buttons
+        ├── SmartAlertModal.tsx      # AQI threshold alert configuration
+        ├── CleanAirFinder.tsx       # Escape planner: finds cleaner-air nearby cities
+        └── PollutionLeaderboard.tsx # Ranked pollution table: worst to cleanest
+```
+
+### Data Flow
+
+```
+Browser → AirQualityContext
+           ├── openMeteoService  → Open-Meteo Air Quality API (hourly, 7d history, 5d forecast)
+           ├── weatherService    → Open-Meteo Weather API (temperature, wind, humidity)
+           └── waqiService       → WAQI Geo Feed API (ground station AQI)
+
+BreatheAI Chat → aiAssistantService
+  Tier 1: POST /api/breathe-ai  (Vercel Edge / Netlify Function / Vite dev proxy)
+    └── Groq → Gemini → Ollama → Llama
+  Tier 2: Direct Gemini fetch (browser CORS)
+  Tier 3: Direct Groq fetch   (browser CORS)
+  Tier 4: Direct Ollama fetch (browser — blocked by CORS, server-side only)
+  Tier 5: Direct Llama fetch  (OpenAI-compatible endpoint)
+  Tier 6: Smart offline contextual engine (typo-tolerant keyword matching)
 ```
 
 ---
 
-## ⚡ Quick Start & Setup Instructions
+## Quick Start
 
-### 1. Prerequisites
-- **Node.js** (v18 or higher)
-- **npm** or **pnpm**
+### Prerequisites
 
-### 2. Clone Repository & Install Dependencies
+- **Node.js** ≥ 18
+- **npm** ≥ 9
+
+### 1. Clone & install
+
 ```bash
-git clone https://github.com/your-username/breathe-better-prana-air.git
-cd breathe-better-prana-air
+git clone https://github.com/your-org/breathe-ai.git
+cd breathe-ai
 npm install
 ```
 
-### 3. Environment Configuration (Optional)
-The platform operates **100% out-of-the-box** without any mandatory API keys!  
-If you wish to configure your custom Supabase database, copy `.env.example`:
+### 2. Configure environment
+
 ```bash
 cp .env.example .env
+# Then fill in your keys — see Environment Variables section below
 ```
-Fill in the optional keys:
-- `GROQ_LLM_API_KEY`: Groq key used only by the Cloudflare Pages Function. Never use a `VITE_` prefix for this key.
-- `GROQ_MODEL`: Optional model override; defaults to `qwen/qwen3.8-27b`.
-- `VITE_SUPABASE_URL`: Supabase Project URL (optional)
-- `VITE_SUPABASE_ANON_KEY`: Supabase Anonymous Key (optional)
-- `VITE_WAQI_TOKEN`: WAQI API Token (defaults to `demo`)
 
-### 4. Run Development Server
+### 3. Run development server
+
 ```bash
 npm run dev
+# → http://localhost:3000
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-> The local Vite server uses BreatheAI's offline guidance fallback. To test live Groq responses locally, run the app through Cloudflare Pages/Wrangler with the `GROQ_LLM_API_KEY` secret configured.
+### 4. Build for production
 
-### 5. Production Build & Test
+```bash
+npm run build        # TypeScript check + Vite bundle
+npm run preview      # Locally preview the built dist/
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root (never commit this file):
+
+```dotenv
+# ── Required ────────────────────────────────────────────────────────────────
+
+# WAQI Air Quality Map Tiles & Station API
+# Free key: https://aqicn.org/data-platform/token/
+VITE_WAQI_TOKEN=your_waqi_token_here
+
+# Google Gemini (AI Tier 2 — direct browser + server proxy)
+# Free key: https://aistudio.google.com/app/apikey
+VITE_GEMINI_API_KEY=your_gemini_key_here
+
+# Groq Cloud (AI Tier 1 primary)
+# Free key: https://console.groq.com/keys
+GROQ_LLM_API_KEY=your_groq_key_here   # server-side proxy
+VITE_GROQ_API_KEY=your_groq_key_here  # client-side direct (browser CORS)
+
+# Supabase (favorites, alerts, community reports)
+# Free project: https://supabase.com/dashboard
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+
+# ── Optional: Ollama Fallback (AI Tier 3) ───────────────────────────────────
+OLLAMA_API_KEY=your_ollama_key_here
+VITE_OLLAMA_API_KEY=your_ollama_key_here
+OLLAMA_BASE_URL=https://ollama.com/v1
+VITE_OLLAMA_BASE_URL=https://ollama.com/v1
+OLLAMA_MODEL=deepseek-v4.1-flash
+VITE_OLLAMA_MODEL=deepseek-v4.1-flash
+
+# ── Optional: Custom Llama / OpenAI-compatible LLM (AI Tier 4) ──────────────
+# Works with Groq, Together AI, OpenRouter, Cerebras, Fireworks, etc.
+# VITE_LLAMA_API_KEY=your_llama_api_key
+# VITE_LLAMA_BASE_URL=https://api.groq.com/openai/v1
+# VITE_LLAMA_MODEL=llama-3.3-70b-versatile
+```
+
+> **Security note:** `GROQ_LLM_API_KEY` and `VITE_GEMINI_API_KEY` are exposed to the browser bundle when prefixed with `VITE_`. For production use, prefer routing all AI calls exclusively through the serverless proxy (`/api/breathe-ai`) and setting only the non-`VITE_` server-side variables.
+
+---
+
+## AI Provider Failover Architecture
+
+The AI assistant uses a **6-tier automatic cascade** — if any tier fails (network error, rate limit, CORS block), the next tier is tried immediately with no visible delay to the user.
+
+| Tier | Provider | Routing | Model |
+|------|----------|---------|-------|
+| 1 | **Serverless Proxy** | `/api/breathe-ai` (Vercel/Netlify/Cloudflare) | Groq → Gemini → Ollama → Llama |
+| 2 | **Google Gemini** | Direct browser fetch | `gemini-3.1-flash-lite` → `gemini-3.5-flash-lite` |
+| 3 | **Groq Cloud** | Direct browser fetch | `qwen/qwen3.8-27b` |
+| 4 | **Ollama** | Server-side only (CORS blocked in browser) | `deepseek-v4.1-flash` |
+| 5 | **Custom Llama** | OpenAI-compatible endpoint | `llama-3.3-70b-versatile` |
+| 6 | **Offline Engine** | In-process keyword matching | Typo-tolerant contextual responses |
+
+> **Ollama note:** `https://ollama.com/v1` blocks cross-origin preflight requests (CORS). In the browser, Ollama is only reached when the serverless proxy is active. In local development, the Vite dev-server proxy plugin at `vite.config.ts` handles this transparently.
+
+---
+
+## Deployment
+
+### Vercel (recommended)
+
+```bash
+npm install -g vercel
+vercel --prod
+```
+
+The `/api/breathe-ai` route is handled by [`functions/api/breathe-ai.ts`](functions/api/breathe-ai.ts) (Cloudflare Pages format, also compatible with Vercel serverless).
+
+Set all environment variables in the **Vercel Dashboard → Project → Settings → Environment Variables**.
+
+### Netlify
+
+The [`netlify.toml`](netlify.toml) is pre-configured:
+
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/breathe-ai"
+  to   = "/.netlify/functions/breathe-ai"
+  status = 200
+```
+
+Deploy:
+```bash
+npm install -g netlify-cli
+netlify deploy --prod
+```
+
+### Self-hosted (Docker / VPS)
+
 ```bash
 npm run build
-npm run preview
+# Serve the dist/ directory with any static file server:
+npx serve dist
 ```
 
 ---
 
-## 🗄️ Database Setup (Supabase PostgreSQL)
-If you wish to connect your online Supabase database:
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Open the **SQL Editor** in your Supabase dashboard.
-3. Paste and run the schema file located at [`supabase/schema.sql`](./supabase/schema.sql).
-4. Add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to `.env`.
+## Internationalization (i18n)
 
-*Note: If no Supabase credentials are provided, BreatheBetter automatically uses a resilient, offline-first LocalStorage persistence engine with identical behavior.*
+BreatheAI supports **7 languages** out of the box:
 
----
+| Code | Language | Native Script |
+|------|----------|---------------|
+| `en` | English | English |
+| `hi` | Hindi | हिन्दी |
+| `bn` | Bengali | বাংলা |
+| `ta` | Tamil | தமிழ் |
+| `te` | Telugu | తెలుగు |
+| `mr` | Marathi | मराठी |
+| `gu` | Gujarati | ગુજરાતી |
 
-## 🌐 1-Click Free Deployment
+**Auto-detection**: On first load, `LanguageContext` reads `navigator.language` and maps it to the closest supported language. The choice is persisted in `localStorage` under the key `breathe-lang`.
 
-### Deploy to Vercel
-1. Push this repository to your GitHub account.
-2. Sign in to [Vercel](https://vercel.com) and click **"Add New Project"**.
-3. Import your GitHub repository.
-4. Leave framework preset as **Vite**, click **Deploy**. Your app is live with SSL and global edge CDN!
-
-### Deploy to Netlify
-1. Sign in to [Netlify](https://netlify.com) and click **"Add new site" -> "Import an existing project"**.
-2. Select your repository. Build command: `npm run build`, Publish directory: `dist`.
-3. Click **Deploy**.
-
-### Deploy BreatheAI with Groq on Cloudflare Pages
-1. Create a Cloudflare Pages project from this repository. Set build command to `npm run build` and output directory to `dist`.
-2. In **Settings → Variables and Secrets**, add `GROQ_LLM_API_KEY` as an encrypted secret. Optionally add `GROQ_MODEL=qwen/qwen3.8-27b`.
-3. Deploy. The included [`functions/api/breathe-ai.ts`](./functions/api/breathe-ai.ts) file is automatically served as `/api/breathe-ai` and keeps the Groq key server-side.
+**Adding a new language**: Edit [`src/i18n/translations.ts`](src/i18n/translations.ts), add a new entry to the `SUPPORTED_LANGUAGES` array and `translations` record, then register the browser locale prefix in `detectInitialLanguage()` inside [`src/context/LanguageContext.tsx`](src/context/LanguageContext.tsx).
 
 ---
 
-## 📚 Authentic Public APIs Integrated
+## External APIs & Data Sources
 
-1. **Open-Meteo Air Quality API**  
-   *URL:* `https://air-quality-api.open-meteo.com/v1/air-quality`  
-   *Models:* Copernicus Atmosphere Monitoring Service (CAMS) 11km Europe / 45km Global & NOAA GFS.  
-   *Variables:* `us_aqi`, `pm2_5`, `pm10`, `carbon_monoxide`, `nitrogen_dioxide`, `sulphur_dioxide`, `ozone`, `dust`, `uv_index`.
-
-2. **Open-Meteo Geocoding API**  
-   *URL:* `https://geocoding-api.open-meteo.com/v1/search`  
-   *Capabilities:* Instant worldwide city and coordinate search.
-
-3. **Open-Meteo Weather API**  
-   *URL:* `https://api.open-meteo.com/v1/forecast`  
-   *Capabilities:* Surface wind speed, wind direction, temperature, and relative humidity for boundary-layer dispersion analysis.
-
-4. **World Air Quality Index (WAQI) Project**  
-   *URL:* `https://api.waqi.info/`  
-   *Capabilities:* Physical ground monitoring stations (Central Pollution Control Board - CPCB India & EPA global feeds).
-
-5. **OpenStreetMap Nominatim Reverse Geocoding**  
-   *URL:* `https://nominatim.openstreetmap.org/reverse`  
-   *Capabilities:* Reverse geocoding on map click and GPS coordinates.
+| Service | Purpose | Free Tier |
+|---------|---------|-----------|
+| [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api) | Real-time + historical + forecast AQI, PM2.5, PM10, NO₂, O₃, SO₂, CO | ✅ Unlimited |
+| [Open-Meteo Weather](https://open-meteo.com/en/docs) | Temperature, humidity, wind speed/direction, weather code | ✅ Unlimited |
+| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | City search by name | ✅ Unlimited |
+| [WAQI](https://waqi.info/) | Ground station AQI + map tile overlays | ✅ Free key |
+| [OSM Nominatim](https://nominatim.openstreetmap.org/) | Reverse geocoding (lat/lon → city name) | ✅ Unlimited |
+| [Google Gemini](https://ai.google.dev/) | AI conversational assistant | ✅ Free quota |
+| [Groq Cloud](https://groq.com/) | AI conversational assistant | ✅ Free quota |
+| [Supabase](https://supabase.com/) | Favorites, alerts, community reports storage | ✅ Free tier |
 
 ---
 
-## ⚖️ License & Credits
-- Built under the **MIT License**.
-- Developed with dedication for the **LETS CODE DIWALI CHALLENGE 2026 🪔**.
-- All environmental data credits belong to Copernicus, NOAA, and CPCB.
+## Scripts
+
+```bash
+npm run dev       # Start Vite dev server at http://localhost:3000
+npm run build     # tsc type-check + Vite production bundle → dist/
+npm run preview   # Locally preview dist/ at http://localhost:4173
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Framework** | React 18 + TypeScript 5.7 |
+| **Build tool** | Vite 6.1 with manual chunk splitting |
+| **Styling** | Tailwind CSS 3.4 + custom CSS animations |
+| **Charts** | Recharts 2 |
+| **Maps** | React-Leaflet 4 + Leaflet 1.9 |
+| **Icons** | Lucide React |
+| **Database** | Supabase JS v2 |
+| **Social card** | HTML5 Canvas (cross-browser `roundRect` polyfill) |
+| **Speech** | Web Speech API (SpeechSynthesis + SpeechRecognition) |
+| **AI** | Google Gemini, Groq (Qwen/Llama), Ollama, OpenAI-compatible |
+| **Deployment** | Vercel / Netlify / Cloudflare Pages |
+
+---
+
+## Contributing
+
+Contributions are welcome. Please follow this workflow:
+
+1. **Fork** the repository and create a feature branch:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+2. **Code** your changes. Make sure the TypeScript compiler and linter are happy:
+   ```bash
+   npm run build
+   ```
+3. **Commit** using [Conventional Commits](https://www.conventionalcommits.org/):
+   ```
+   feat: add ozone forecast overlay to map
+   fix: resolve canvas roundRect crash on iOS Safari
+   docs: update API environment variables table
+   ```
+4. **Push** and open a **Pull Request** against `main`. Fill in the PR template.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guidelines.
+
+---
+
+## License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+Made with 🌿 for cleaner air and healthier days. <br/>
+**Breathe Smarter. Live Better.**
+
+</div>

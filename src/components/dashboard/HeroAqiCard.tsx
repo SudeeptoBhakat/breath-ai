@@ -15,6 +15,7 @@ import {
   Activity
 } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { formatDateTime } from '../../utils/formatters';
 
 interface HeroAqiCardProps {
@@ -49,6 +50,7 @@ const getConditionVisual = (weatherCode: number, aqi: number) => {
 
 export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenShareModal }) => {
   const { selectedLocation, currentData, weatherData, isLoading, error, setActiveTab } = useAirQuality();
+  const { t } = useLanguage();
 
   if (isLoading) {
     return (
@@ -155,7 +157,7 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
                 className="px-5 py-2.5 rounded-xl bg-[#173D32] hover:bg-[#245543] text-[#F7F5ED] text-xs sm:text-sm font-semibold font-heading transition-all shadow-card hover:shadow-card-hover flex items-center gap-2 hover:-translate-y-0.5"
               >
                 <Sparkles className="w-4 h-4 text-[#65B9C9]" />
-                <span>Ask about today’s air</span>
+                <span>{t('hero.consultAi')}</span>
                 <ArrowRight className="w-3.5 h-3.5 opacity-80" />
               </button>
 
@@ -169,7 +171,7 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
               <button
                 onClick={onOpenShareModal}
                 className="p-2.5 rounded-xl bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors shadow-soft"
-                title="Share Air Quality Report"
+                title={t('hero.shareCard')}
               >
                 <Share2 className="w-4 h-4" />
               </button>
@@ -185,7 +187,7 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold text-[#89938A] uppercase tracking-wider font-heading block">
-                    Air quality now
+                    {t('hero.liveAirQuality')}
                   </span>
                   <p className="text-xs text-[#58645C] mt-0.5 font-medium">{selectedLocation.name} · nearest reporting station</p>
                 </div>
@@ -198,7 +200,7 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
                     border: `1px solid ${categoryInfo.color}30`
                   }}
                 >
-                  {category}
+                  {t(`aqi.${category.toLowerCase().replace(/[\s-]+/g, '')}`) || category}
                 </span>
               </div>
 
@@ -218,7 +220,7 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[10px] text-[#89938A] uppercase font-bold block">Dominant Driver</span>
+                  <span className="text-[10px] text-[#89938A] uppercase font-bold block">{t('hero.dominantDriver')}</span>
                   <span className="text-sm font-bold font-mono text-[#8B5E3C]">{dominantPollutant}</span>
                   <span className="text-[11px] text-[#58645C] block">
                     {pollutants.pm2_5?.value ?? 0} µg/m³

@@ -15,6 +15,7 @@ import {
   Languages
 } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { askBreatheAI, ChatMessage } from '../../services/aiAssistantService';
 import { SpeechAssistant } from '../../services/speechService';
 
@@ -25,15 +26,34 @@ interface BreatheAiChatProps {
 
 export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose }) => {
   const { selectedLocation, currentData } = useAirQuality();
+  const { language: currentAppLang } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [language, setLanguage] = useState('Auto');
+
+  const langCodeToName: Record<string, string> = {
+    hi: 'Hindi',
+    bn: 'Bengali',
+    ta: 'Tamil',
+    te: 'Telugu',
+    mr: 'Marathi',
+    gu: 'Gujarati',
+    en: 'English'
+  };
+
+  const [language, setLanguage] = useState(() => langCodeToName[currentAppLang] || 'Auto');
   const [isClosing, setIsClosing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number | null>(null);
+
+  // Sync AI response language if app language changes
+  useEffect(() => {
+    if (langCodeToName[currentAppLang]) {
+      setLanguage(langCodeToName[currentAppLang]);
+    }
+  }, [currentAppLang]);
 
   const handleClose = useCallback(() => {
     if (isClosing) return;
@@ -158,7 +178,14 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
       setIsSpeaking(false);
     } else {
       setIsSpeaking(true);
-      SpeechAssistant.speak(text, () => setIsSpeaking(false), language === 'Hindi' ? 'hi-IN' : language === 'Bengali' ? 'bn-IN' : language === 'Tamil' ? 'ta-IN' : 'en-US');
+      const voiceLang = 
+        language === 'Hindi' ? 'hi-IN' :
+        language === 'Bengali' ? 'bn-IN' :
+        language === 'Tamil' ? 'ta-IN' :
+        language === 'Telugu' ? 'te-IN' :
+        language === 'Marathi' ? 'mr-IN' :
+        language === 'Gujarati' ? 'gu-IN' : 'en-US';
+      SpeechAssistant.speak(text, () => setIsSpeaking(false), voiceLang);
     }
   };
 
@@ -216,6 +243,9 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
                   <option>Hindi</option>
                   <option>Bengali</option>
                   <option>Tamil</option>
+                  <option>Telugu</option>
+                  <option>Marathi</option>
+                  <option>Gujarati</option>
                 </select>
               </div>
               <button

@@ -15,10 +15,12 @@ import {
   PlayCircle
 } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { AQI_CATEGORIES } from '../../utils/aqiCalculator';
 
 export const HealthAdvisoryCard: React.FC = () => {
   const { currentData, selectedLocation } = useAirQuality();
+  const { t } = useLanguage();
 
   const aqi = currentData?.aqi || 191;
   const currentCategory = currentData?.category || 'Unhealthy';
@@ -34,11 +36,11 @@ export const HealthAdvisoryCard: React.FC = () => {
             <div className="flex items-center gap-2">
               <HeartPulse className="w-5 h-5 text-[#8B5E3C]" />
               <h2 className="text-xl font-bold font-heading text-[#173D32] tracking-tight">
-                Clinical Health Advisory: {selectedLocation.name}
+                {t('health.title')}: {selectedLocation.name}
               </h2>
             </div>
             <p className="text-xs text-[#58645C] mt-0.5">
-              Actionable precautions calibrated for real-time {aqi} AQI ({currentCategory})
+              {t('health.subtitle')} • {aqi} AQI ({currentCategory})
             </p>
           </div>
 
@@ -74,7 +76,7 @@ export const HealthAdvisoryCard: React.FC = () => {
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2 text-[#173D32] text-xs font-semibold font-heading">
                   <span className="health-guidance-icon"><Activity className="w-4 h-4" /></span>
-                  <span>Outdoor cardio</span>
+                  <span>{t('health.exercise')}</span>
                 </div>
                 <span className="health-guidance-state">Activity</span>
               </div>
@@ -95,7 +97,7 @@ export const HealthAdvisoryCard: React.FC = () => {
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2 text-[#173D32] text-xs font-semibold font-heading">
                   <span className="health-guidance-icon"><Home className="w-4 h-4" /></span>
-                  <span>Home ventilation</span>
+                  <span>{t('health.ventilation')}</span>
                 </div>
                 <span className="health-guidance-state">Home</span>
               </div>
@@ -116,7 +118,7 @@ export const HealthAdvisoryCard: React.FC = () => {
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2 text-[#173D32] text-xs font-semibold font-heading">
                   <span className="health-guidance-icon"><ShieldAlert className="w-4 h-4" /></span>
-                  <span>Mask protocol</span>
+                  <span>{t('health.masks')}</span>
                 </div>
                 <span className="health-guidance-state">Outdoors</span>
               </div>
@@ -139,7 +141,7 @@ export const HealthAdvisoryCard: React.FC = () => {
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div className="flex items-center gap-2 text-[#173D32] text-xs font-semibold font-heading">
                   <span className="health-guidance-icon"><Wind className="w-4 h-4" /></span>
-                  <span>HEPA filtration</span>
+                  <span>{t('health.purifiers')}</span>
                 </div>
                 <span className="health-guidance-state">Indoors</span>
               </div>
@@ -160,7 +162,7 @@ export const HealthAdvisoryCard: React.FC = () => {
       <div className="bg-white border border-[#E3E6DC] rounded-3xl p-6 sm:p-8 shadow-card">
         <h3 className="text-base font-bold font-heading text-[#173D32] mb-4 flex items-center gap-2">
           <Baby className="w-4 h-4 text-[#8B5E3C]" />
-          <span>Vulnerable & Sensitive Demographics</span>
+          <span>{t('health.vulnerable')}</span>
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-[#58645C]">

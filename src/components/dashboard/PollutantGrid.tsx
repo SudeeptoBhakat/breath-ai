@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp, AlertCircle, Info, Wind, ShieldCheck } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { PollutantDetail } from '../../types/aqi';
 
 export const PollutantGrid: React.FC = () => {
   const { currentData, isLoading } = useAirQuality();
+  const { t } = useLanguage();
   const [activeCode, setActiveCode] = useState<string | null>(null);
 
   if (isLoading || !currentData) return null;
@@ -18,13 +20,13 @@ export const PollutantGrid: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
         <div>
           <h2 className="text-base font-bold font-heading text-[#173D32] tracking-tight flex items-center gap-2">
-            <span>Atmospheric Pollutant Telemetry</span>
+            <span>{t('pollutants.title')}</span>
             <span className="text-[10px] font-medium font-sans px-2.5 py-0.5 rounded-full bg-[#EEF1E8] text-[#173D32] border border-[#E3E6DC]">
               Ground Sensors
             </span>
           </h2>
           <p className="text-xs text-[#58645C] mt-0.5">
-            Calibrated concentrations evaluated against World Health Organization 24-hour guidelines
+            {t('pollutants.subtitle')}
           </p>
         </div>
 

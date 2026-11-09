@@ -16,6 +16,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Puffy Material You Cloud Icon
 const PuffyCloud: React.FC<{ className?: string; style?: React.CSSProperties }> = ({ className = '', style }) => (
@@ -33,6 +34,7 @@ const PuffyCloud: React.FC<{ className?: string; style?: React.CSSProperties }> 
 
 export const WeatherCard: React.FC = () => {
   const { weatherData, selectedLocation, isLoading } = useAirQuality();
+  const { t } = useLanguage();
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
 
   // Weather state & dynamic theme computation
@@ -228,9 +230,9 @@ export const WeatherCard: React.FC = () => {
         {/* Google Weather Style Header */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-xs font-semibold tracking-wide text-white shadow-sm">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md border border-white/30 text-xs font-semibold tracking-wide text-white shadow-sm font-heading">
               <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
-              <span>Atmospheric Weather</span>
+              <span>{t('weather.badge')}</span>
             </span>
             <span className="text-xs text-white/80 hidden sm:inline-block font-medium">
               {selectedLocation.name}
@@ -259,7 +261,7 @@ export const WeatherCard: React.FC = () => {
             </h3>
             
             <p className="text-xs sm:text-sm text-white/85 font-medium mt-0.5">
-              {weatherDescription} • Feels like {temperature + (humidity > 60 ? 1 : 0)}°
+              {weatherDescription} • {t('weather.feelsLike')} {temperature + (humidity > 60 ? 1 : 0)}°
             </p>
           </div>
 
@@ -267,9 +269,9 @@ export const WeatherCard: React.FC = () => {
           <div className="flex items-center gap-2 bg-black/20 backdrop-blur-md border border-white/20 px-3.5 py-2 rounded-2xl sm:self-end">
             <ShieldAlert className={`w-4 h-4 ${inversionRisk === 'Severe' ? 'text-rose-300' : inversionRisk === 'High' ? 'text-amber-300' : 'text-emerald-300'}`} />
             <div className="text-left">
-              <p className="text-[10px] text-white/70 uppercase tracking-wider font-semibold">Pollutant Flushing</p>
+              <p className="text-[10px] text-white/70 uppercase tracking-wider font-semibold font-heading">{t('weather.flushing')}</p>
               <p className="text-xs font-bold text-white">
-                {inversionRisk === 'Low' ? 'Active Dispersal (Safe)' : `${inversionRisk} Inversion Risk`}
+                {inversionRisk === 'Low' ? t('weather.activeDispersal') : `${inversionRisk} ${t('weather.inversionRisk')}`}
               </p>
             </div>
           </div>
@@ -281,7 +283,7 @@ export const WeatherCard: React.FC = () => {
           {/* Surface Wind */}
           <div className={`p-3.5 rounded-2xl ${cardGlass} backdrop-blur-md transition-all duration-200 hover:bg-white/25 hover:scale-[1.02]`}>
             <div className="flex items-center justify-between text-white/80">
-              <span className="text-[11px] font-medium tracking-wide">Wind Speed</span>
+              <span className="text-[11px] font-medium tracking-wide">{t('weather.windSpeed')}</span>
               <Wind className="w-4 h-4" />
             </div>
             <div className="mt-1.5 flex items-baseline gap-1">
@@ -289,14 +291,14 @@ export const WeatherCard: React.FC = () => {
               <span className="text-xs text-white/75 font-sans">km/h</span>
             </div>
             <span className="text-[10px] text-white/80 font-medium block mt-0.5">
-              {windSpeed < 6 ? 'Calm (Smoke traps)' : windSpeed < 14 ? 'Light breeze' : 'Active clearing'}
+              {windSpeed < 6 ? t('weather.calmSmokeTraps') : windSpeed < 14 ? t('weather.lightBreeze') : t('weather.activeClearing')}
             </span>
           </div>
 
           {/* Humidity */}
           <div className={`p-3.5 rounded-2xl ${cardGlass} backdrop-blur-md transition-all duration-200 hover:bg-white/25 hover:scale-[1.02]`}>
             <div className="flex items-center justify-between text-white/80">
-              <span className="text-[11px] font-medium tracking-wide">Humidity</span>
+              <span className="text-[11px] font-medium tracking-wide">{t('weather.humidity')}</span>
               <Droplets className="w-4 h-4 text-cyan-200" />
             </div>
             <div className="mt-1.5 flex items-baseline gap-1">
@@ -304,14 +306,14 @@ export const WeatherCard: React.FC = () => {
               <span className="text-xs text-white/75 font-sans">%</span>
             </div>
             <span className="text-[10px] text-white/80 font-medium block mt-0.5">
-              {humidity > 70 ? 'Moisture holds smog' : 'Comfortable'}
+              {humidity > 70 ? t('weather.highMoisture') : t('weather.comfortable')}
             </span>
           </div>
 
           {/* Natural Ventilation */}
           <div className={`p-3.5 rounded-2xl ${cardGlass} backdrop-blur-md transition-all duration-200 hover:bg-white/25 hover:scale-[1.02]`}>
             <div className="flex items-center justify-between text-white/80">
-              <span className="text-[11px] font-medium tracking-wide">Ventilation</span>
+              <span className="text-[11px] font-medium tracking-wide">{t('weather.ventilation')}</span>
               <Compass className="w-4 h-4 text-emerald-200" />
             </div>
             <div className="mt-1.5 flex items-baseline gap-1">
@@ -325,14 +327,14 @@ export const WeatherCard: React.FC = () => {
           {/* Smoke Trapping / Inversion */}
           <div className={`p-3.5 rounded-2xl ${cardGlass} backdrop-blur-md transition-all duration-200 hover:bg-white/25 hover:scale-[1.02]`}>
             <div className="flex items-center justify-between text-white/80">
-              <span className="text-[11px] font-medium tracking-wide">Smoke Trap</span>
+              <span className="text-[11px] font-medium tracking-wide">{t('weather.smokeTrap')}</span>
               <ShieldAlert className="w-4 h-4 text-amber-200" />
             </div>
             <div className="mt-1.5 flex items-baseline gap-1">
               <span className="text-2xl font-bold font-mono tracking-tight">{inversionRisk}</span>
             </div>
             <span className="text-[10px] text-white/80 font-medium block mt-0.5">
-              {inversionRisk === 'Low' ? 'Clean vertical mixing' : 'Trapped near surface'}
+              {inversionRisk === 'Low' ? t('weather.cleanVertical') : t('weather.trappedNear')}
             </span>
           </div>
 
@@ -350,9 +352,9 @@ export const WeatherCard: React.FC = () => {
         <div className="pt-1 flex flex-col items-center">
           <button
             onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white transition-colors py-1 px-3 rounded-full hover:bg-white/10"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 hover:text-white transition-colors py-1 px-3 rounded-full hover:bg-white/10 font-heading"
           >
-            <span>{showTechnicalDetails ? 'Hide technical physics' : 'Show boundary layer physics'}</span>
+            <span>{showTechnicalDetails ? t('weather.hideBoundary') : t('weather.showBoundary')}</span>
             {showTechnicalDetails ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
 

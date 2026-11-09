@@ -1,6 +1,7 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { AirQualityProvider, useAirQuality } from './context/AirQualityContext';
 import { AlertProvider } from './context/AlertContext';
+import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/layout/Navbar';
 import { DiwaliBanner } from './components/layout/DiwaliBanner';
 import { Footer } from './components/layout/Footer';
@@ -136,11 +137,13 @@ const AppContent: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <ErrorBoundary>
-      <AlertProvider>
-        <AirQualityProvider>
-          <AppContent />
-        </AirQualityProvider>
-      </AlertProvider>
+      <LanguageProvider>
+        <AlertProvider>
+          <AirQualityProvider>
+            <AppContent />
+          </AirQualityProvider>
+        </AlertProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 };
