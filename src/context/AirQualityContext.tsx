@@ -32,7 +32,21 @@ interface AirQualityContextType {
 const AirQualityContext = createContext<AirQualityContextType | undefined>(undefined);
 
 export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [selectedLocation, setSelectedLocation] = useState<LocationData>(PRESET_CITIES[0]); // Default: New Delhi
+  const [selectedLocation, setSelectedLocationState] = useState<LocationData>(() => {
+    try {
+      const saved = localStorage.getItem('breathe_last_selected_location');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return PRESET_CITIES[0]; // Default: New Delhi
+  });
+
+  const setSelectedLocation = useCallback((loc: LocationData) => {
+    setSelectedLocationState(loc);
+    try {
+      localStorage.setItem('breathe_last_selected_location', JSON.stringify(loc));
+    } catch {}
+  }, []);
+
   const [currentData, setCurrentData] = useState<CurrentAirQuality | null>(null);
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [hourlyHistory, setHourlyHistory] = useState<HourlyReading[]>([]);
@@ -76,9 +90,10 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setHourlyForecast(aqData.hourlyForecast);
       setDailyTrends(aqData.dailyTrends);
       setSpikes(aqData.spikes);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load air quality data:', err);
-      setError(err?.message || 'Failed to retrieve real-time air quality telemetry. Please check connection.');
+      const msg = err instanceof Error ? err.message : 'Failed to retrieve real-time air quality telemetry. Please check connection.';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -88,13 +103,52 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     loadDataForLocation(selectedLocation);
   }, [selectedLocation, loadDataForLocation]);
 
-  // Ask once on a fresh visit so the dashboard starts with relevant local data.
-  // Browsers retain the user's decision; rejection simply keeps the selected default city.
+  const locateMe = useCallback((silently = false) => {
+    if (!navigator.geolocation) {
+      if (!silently) alert('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    if (!silently) {
+      try {
+        localStorage.setItem('breathe_has_located', 'true');
+      } catch {}
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const loc = await reverseGeocode(lat, lon);
+          setSelectedLocation(loc);
+        } catch (e) {
+          console.error('Error reverse geocoding current location:', e);
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (err) => {
+        console.warn('Geolocation denied or failed:', err);
+        setIsLocating(false);
+        if (!silently) alert('Could not access your location. Please ensure location permissions are enabled.');
+      },
+      silently
+        ? { timeout: 4000, enableHighAccuracy: false, maximumAge: 300000 }
+        : { timeout: 10000, enableHighAccuracy: true }
+    );
+  }, [setSelectedLocation]);
+
+  // Only auto-locate silently if user has previously allowed location
   useEffect(() => {
-    locateMe(true);
-    // locateMe is intentionally invoked only at first mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    try {
+      const previouslyAllowed = localStorage.getItem('breathe_has_located') === 'true';
+      if (previouslyAllowed) {
+        locateMe(true);
+      }
+    } catch {}
+  }, [locateMe]);
 
   const refreshData = async () => {
     await loadDataForLocation(selectedLocation);
@@ -119,34 +173,6 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const locateMe = (silently = false) => {
-    if (!navigator.geolocation) {
-      if (!silently) alert('Geolocation is not supported by your browser.');
-      return;
-    }
-
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          const loc = await reverseGeocode(lat, lon);
-          setSelectedLocation(loc);
-        } catch (e) {
-          console.error('Error reverse geocoding current location:', e);
-        } finally {
-          setIsLocating(false);
-        }
-      },
-      (err) => {
-        console.warn('Geolocation denied or failed:', err);
-        setIsLocating(false);
-        if (!silently) alert('Could not access your location. Please ensure location permissions are enabled.');
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
-  };
 
   return (
     <AirQualityContext.Provider

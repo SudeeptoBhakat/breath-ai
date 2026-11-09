@@ -93,11 +93,16 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vendor-react': ['react', 'react-dom'],
-            'vendor-charts': ['recharts'],
-            'vendor-maps': ['leaflet', 'react-leaflet'],
-            'vendor-icons': ['lucide-react']
+          manualChunks(id) {
+            if (id.includes('node_modules/recharts')) {
+              return 'vendor-charts';
+            }
+            if (id.includes('node_modules/leaflet') || id.includes('node_modules/react-leaflet')) {
+              return 'vendor-maps';
+            }
+            if (id.includes('node_modules/lucide-react')) {
+              return 'vendor-icons';
+            }
           }
         }
       }

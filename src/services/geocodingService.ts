@@ -103,8 +103,15 @@ export const PRESET_CITIES: LocationData[] = [
   }
 ];
 
+const searchCache = new Map<string, LocationData[]>();
+const reverseCache = new Map<string, LocationData>();
+
 export async function searchLocations(query: string): Promise<LocationData[]> {
-  if (!query || query.trim().length < 2) return [];
+  const q = query.trim().toLowerCase();
+  if (!q || q.length < 2) return [];
+
+  const cached = searchCache.get(q);
+  if (cached) return cached;
 
   try {
     const params = new URLSearchParams({
@@ -120,7 +127,17 @@ export async function searchLocations(query: string): Promise<LocationData[]> {
     const data = await response.json();
     if (!data.results || !Array.isArray(data.results)) return [];
 
-    return data.results.map((item: any) => {
+    const results = data.results.map((item: {
+      id?: number;
+      name: string;
+      latitude: number;
+      longitude: number;
+      country?: string;
+      country_code?: string;
+      admin1?: string;
+      elevation?: number;
+      timezone?: string;
+    }) => {
       const parts = [item.name];
       if (item.admin1 && item.admin1 !== item.name) parts.push(item.admin1);
       if (item.country) parts.push(item.country);
@@ -138,6 +155,9 @@ export async function searchLocations(query: string): Promise<LocationData[]> {
         timezone: item.timezone
       };
     });
+
+    searchCache.set(q, results);
+    return results;
   } catch (error) {
     console.error('Failed to search locations:', error);
     return [];
@@ -148,6 +168,10 @@ export async function searchLocations(query: string): Promise<LocationData[]> {
  * Reverse geocodes coordinates to a human-readable city and country
  */
 export async function reverseGeocode(latitude: number, longitude: number): Promise<LocationData> {
+  const cacheKey = `${latitude.toFixed(3)}_${longitude.toFixed(3)}`;
+  const cached = reverseCache.get(cacheKey);
+  if (cached) return cached;
+
   try {
     // Free openStreetMap Nominatim reverse geocode
     const response = await fetch(
@@ -170,7 +194,7 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
       if (admin1 && admin1 !== cityName) parts.push(admin1);
       if (country) parts.push(country);
 
-      return {
+      const result: LocationData = {
         id: `custom-${latitude.toFixed(3)}-${longitude.toFixed(3)}`,
         name: cityName,
         displayName: parts.join(', '),
@@ -180,6 +204,9 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
         countryCode: (addr.country_code || '').toUpperCase(),
         admin1
       };
+
+      reverseCache.set(cacheKey, result);
+      return result;
     }
   } catch (e) {
     console.warn('Reverse geocode fallback:', e);

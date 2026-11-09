@@ -11,6 +11,10 @@ import { formatTime, formatDateShort, calculatePercentageChange } from '../utils
 
 const AIR_QUALITY_BASE_URL = 'https://air-quality-api.open-meteo.com/v1/air-quality';
 
+// In-memory cache with 5-minute TTL to prevent redundant network fetches
+const cache = new Map<string, { timestamp: number; data: AirQualityFetchResult }>();
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 export interface AirQualityFetchResult {
   current: CurrentAirQuality;
   hourlyHistory: HourlyReading[];
@@ -26,6 +30,12 @@ export async function fetchAirQualityData(
   latitude: number,
   longitude: number
 ): Promise<AirQualityFetchResult> {
+  const cacheKey = `${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
+  const cached = cache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   const params = new URLSearchParams({
     latitude: latitude.toFixed(4),
     longitude: longitude.toFixed(4),
@@ -199,11 +209,14 @@ export async function fetchAirQualityData(
     });
   }
 
-  return {
+  const result: AirQualityFetchResult = {
     current,
     hourlyHistory,
     hourlyForecast,
     dailyTrends,
     spikes: spikes.slice(-10) // Keep the most recent 10 notable spikes
   };
+
+  cache.set(cacheKey, { timestamp: Date.now(), data: result });
+  return result;
 }

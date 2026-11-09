@@ -58,6 +58,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isSearching, setIsSearching] = useState(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -66,20 +67,28 @@ export const Navbar: React.FC<NavbarProps> = ({
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    };
   }, []);
 
-  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchQuery(val);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
     if (val.trim().length >= 2) {
       setIsSearching(true);
-      const results = await searchLocations(val);
-      setSearchResults(results);
-      setIsSearching(false);
-      setIsOpenDropdown(true);
+      searchTimeoutRef.current = setTimeout(async () => {
+        const results = await searchLocations(val);
+        setSearchResults(results);
+        setIsSearching(false);
+        setIsOpenDropdown(true);
+      }, 250);
     } else {
       setSearchResults([]);
+      setIsSearching(false);
       setIsOpenDropdown(false);
     }
   };

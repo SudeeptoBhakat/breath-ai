@@ -125,71 +125,88 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="chat-dialog-shell fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#173D32]/70 backdrop-blur-sm animate-fadeIn">
-      <div className="chat-dialog relative w-full max-w-xl bg-[#F7F5ED] border border-[#E3E6DC] rounded-3xl shadow-card flex flex-col h-[620px] max-h-[88vh] overflow-hidden animate-enter">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="chat-dialog-shell fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-[#173D32]/75 backdrop-blur-sm animate-fadeIn overscroll-contain"
+    >
+      <div className="chat-dialog relative w-full h-[100dvh] sm:h-[620px] max-h-[100dvh] sm:max-h-[88vh] sm:max-w-xl bg-[#F7F5ED] border-0 sm:border sm:border-[#E3E6DC] rounded-none sm:rounded-3xl shadow-card flex flex-col overflow-hidden animate-enter">
         
         {/* Dark Forest Green Header: Nature × AI Technology */}
-        <div className="p-4 bg-[#173D32] text-[#F7F5ED] border-b border-[#245543] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#245543] border border-[#A8B99A]/40 flex items-center justify-center text-[#65B9C9]">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold font-heading text-white">BreatheAI Assistant</h3>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#245543] text-[#65B9C9] font-mono border border-[#65B9C9]/30">Live assistant</span>
-              </div>
-              <p className="text-[11px] text-[#A8B99A]">
-                Sensor Context: {selectedLocation.name} ({currentData?.aqi || 0} AQI)
-              </p>
-            </div>
-          </div>
+        <div className="p-3 sm:p-4 bg-[#173D32] text-[#F7F5ED] border-b border-[#245543]">
+          {/* Mobile swipe/drag affordance indicator */}
+          <div className="sm:hidden w-10 h-1 bg-white/30 rounded-full mx-auto mb-2" />
 
-          <div className="flex items-center gap-1">
-            <div className="relative mr-1">
-              <Languages className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#65B9C9] pointer-events-none" />
-              <select value={language} onChange={(e) => setLanguage(e.target.value)} className="appearance-none bg-[#245543] border border-[#65B9C9]/30 rounded-lg pl-6 pr-2 py-1.5 text-[10px] text-white outline-none cursor-pointer">
-                <option>Auto</option>
-                <option>English</option>
-                <option>Hindi</option>
-                <option>Bengali</option>
-                <option>Tamil</option>
-              </select>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#245543] border border-[#A8B99A]/40 flex items-center justify-center text-[#65B9C9] flex-shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="text-xs sm:text-sm font-bold font-heading text-white truncate">BreatheAI Assistant</h3>
+                  <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-[#245543] text-[#65B9C9] font-mono border border-[#65B9C9]/30">Live assistant</span>
+                </div>
+                <p className="text-[10px] sm:text-[11px] text-[#A8B99A] truncate">
+                  Context: {selectedLocation.name} (AQI {currentData?.aqi || '–'})
+                </p>
+              </div>
             </div>
-            <button
-              onClick={() => setMessages([])}
-              className="p-1.5 rounded-lg text-[#A8B99A] hover:text-white hover:bg-[#245543] transition-colors"
-              title="Reset conversation"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-[#A8B99A] hover:text-white hover:bg-[#245543] transition-colors"
-              title="Close chat"
-            >
-              <X className="w-4 h-4" />
-            </button>
+
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="relative">
+                <Languages className="absolute left-1.5 sm:left-2 top-1/2 -translate-y-1/2 w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#65B9C9] pointer-events-none" />
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="appearance-none bg-[#245543] border border-[#65B9C9]/30 rounded-lg pl-5 sm:pl-6 pr-2 py-1 sm:py-1.5 text-[10px] text-white outline-none cursor-pointer"
+                  aria-label="Select AI language"
+                >
+                  <option>Auto</option>
+                  <option>English</option>
+                  <option>Hindi</option>
+                  <option>Bengali</option>
+                  <option>Tamil</option>
+                </select>
+              </div>
+              <button
+                onClick={() => setMessages([])}
+                className="p-1.5 sm:p-2 rounded-lg text-[#A8B99A] hover:text-white hover:bg-[#245543] transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+                title="Reset conversation"
+                aria-label="Reset conversation"
+              >
+                <RotateCcw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+              <button
+                onClick={onClose}
+                className="p-1.5 sm:p-2 rounded-lg text-[#A8B99A] hover:text-white hover:bg-[#245543] transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
+                title="Close chat"
+                aria-label="Close chat"
+              >
+                <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Message Thread */}
-        <div className="chat-thread flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#F7F5ED]">
+        <div className="chat-thread flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#F7F5ED] overscroll-contain">
           <div className="chat-thread-art" aria-hidden="true" />
           {messages.map((msg) => {
             const isUser = msg.sender === 'user';
             return (
               <div
                 key={msg.id}
-                className={`flex gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-2 sm:gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
               >
                 {!isUser && (
-                  <div className="w-8 h-8 rounded-xl bg-[#EEF1E8] text-[#173D32] border border-[#E3E6DC] flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Leaf className="w-4 h-4 text-[#2D6A4F]" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF1E8] text-[#173D32] border border-[#E3E6DC] flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Leaf className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#2D6A4F]" />
                   </div>
                 )}
 
-                <div className={`max-w-[85%] rounded-2xl p-4 text-xs leading-relaxed ${
+                <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 text-xs leading-relaxed break-words ${
                   isUser
                     ? 'bg-[#173D32] text-[#F7F5ED] font-medium shadow-soft'
                     : 'bg-white border border-[#E3E6DC] text-[#26332D] shadow-soft'
@@ -201,8 +218,9 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
                     {!isUser && (
                       <button
                         onClick={() => handleSpeak(msg.text)}
-                        className="hover:text-[#173D32] flex items-center gap-1 ml-2 transition-colors"
+                        className="hover:text-[#173D32] flex items-center gap-1 ml-2 transition-colors p-1"
                         title="Voice readout"
+                        aria-label="Voice readout"
                       >
                         {isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-[#8B5E3C]" /> : <Volume2 className="w-3.5 h-3.5" />}
                       </button>
@@ -210,7 +228,7 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
                   </div>
 
                   {msg.suggestions && (
-                    <div className="mt-3 pt-3 border-t border-[#E3E6DC] flex flex-wrap gap-1.5">
+                    <div className="mt-2.5 pt-2.5 border-t border-[#E3E6DC] flex flex-wrap gap-1.5">
                       {msg.suggestions.map((chip, idx) => (
                         <button
                           key={idx}
@@ -225,8 +243,8 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
                 </div>
 
                 {isUser && (
-                  <div className="w-8 h-8 rounded-xl bg-[#245543] text-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <User className="w-4 h-4 text-[#A8B99A]" />
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#245543] text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#A8B99A]" />
                   </div>
                 )}
               </div>
@@ -235,10 +253,10 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
 
           {isTyping && (
             <div className="flex gap-2 items-center text-xs text-[#58645C]">
-              <div className="w-8 h-8 rounded-xl bg-[#EEF1E8] flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[#EEF1E8] flex items-center justify-center flex-shrink-0">
                 <Loader2 className="w-4 h-4 animate-spin text-[#173D32]" />
               </div>
-              <div className="bg-white p-3 rounded-2xl border border-[#E3E6DC] text-[#58645C] shadow-soft">
+              <div className="bg-white p-2.5 sm:p-3 rounded-2xl border border-[#E3E6DC] text-[#58645C] shadow-soft">
                 Analyzing sensor telemetry...
               </div>
             </div>
@@ -246,20 +264,21 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Bar */}
-        <div className="p-3.5 bg-white border-t border-[#E3E6DC]">
+        {/* Input Bar with Safe Area Inset Support */}
+        <div className="p-2.5 sm:p-3.5 bg-white border-t border-[#E3E6DC] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage(inputText);
             }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-1.5 sm:gap-2"
           >
             <button
               type="button"
               onClick={toggleVoiceInput}
               title={isListening ? 'Stop recording' : 'Voice input'}
-              className={`p-2.5 rounded-xl border transition-colors ${
+              aria-label={isListening ? 'Stop voice recording' : 'Start voice input'}
+              className={`p-2 sm:p-2.5 rounded-xl border transition-colors flex-shrink-0 ${
                 isListening
                   ? 'bg-[#A83232] text-white border-[#A83232]'
                   : 'bg-[#EEF1E8] text-[#173D32] hover:bg-[#A8B99A]/40 border-[#E3E6DC]'
@@ -272,14 +291,15 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Ask about your day, health, or outdoor plans..."
-              className="flex-1 text-xs sm:text-sm px-3.5 py-2.5 bg-[#F7F5ED] border border-[#E3E6DC] rounded-xl text-[#26332D] placeholder-[#89938A] focus:outline-none focus:border-[#173D32] focus:ring-1 focus:ring-[#173D32]/20"
+              placeholder="Ask about air quality, masks, plans..."
+              className="flex-1 min-w-0 text-xs sm:text-sm px-3 py-2 sm:px-3.5 sm:py-2.5 bg-[#F7F5ED] border border-[#E3E6DC] rounded-xl text-[#26332D] placeholder-[#89938A] focus:outline-none focus:border-[#173D32] focus:ring-1 focus:ring-[#173D32]/20"
             />
 
             <button
               type="submit"
               disabled={!inputText.trim() || isTyping}
-              className="px-4 py-2.5 rounded-xl bg-[#173D32] hover:bg-[#245543] disabled:opacity-40 text-[#F7F5ED] font-semibold font-heading transition-colors flex items-center gap-1.5 shadow-soft"
+              aria-label="Send message"
+              className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#173D32] hover:bg-[#245543] disabled:opacity-40 text-[#F7F5ED] font-semibold font-heading transition-colors flex items-center gap-1.5 shadow-soft flex-shrink-0"
             >
               <Send className="w-4 h-4 text-[#65B9C9]" />
             </button>

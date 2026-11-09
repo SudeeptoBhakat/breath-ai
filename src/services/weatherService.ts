@@ -2,6 +2,10 @@ import { getWeatherConditionName } from '../utils/formatters';
 
 const WEATHER_BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 
+// In-memory cache with 5-minute TTL to prevent redundant weather fetches
+const weatherCache = new Map<string, { timestamp: number; data: WeatherData }>();
+const WEATHER_CACHE_TTL_MS = 5 * 60 * 1000;
+
 export interface WeatherData {
   temperature: number;
   humidity: number;
@@ -14,6 +18,12 @@ export interface WeatherData {
 }
 
 export async function fetchWeatherData(latitude: number, longitude: number): Promise<WeatherData | null> {
+  const cacheKey = `${latitude.toFixed(2)}_${longitude.toFixed(2)}`;
+  const cached = weatherCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < WEATHER_CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   try {
     const params = new URLSearchParams({
       latitude: latitude.toFixed(4),
@@ -50,7 +60,7 @@ export async function fetchWeatherData(latitude: number, longitude: number): Pro
       ventilationIndex = 'Moderate';
     }
 
-    return {
+    const result: WeatherData = {
       temperature: Math.round(temp),
       humidity: Math.round(humidity),
       windSpeed: Math.round(wind),
@@ -60,6 +70,9 @@ export async function fetchWeatherData(latitude: number, longitude: number): Pro
       inversionRisk,
       ventilationIndex
     };
+
+    weatherCache.set(cacheKey, { timestamp: Date.now(), data: result });
+    return result;
   } catch (error) {
     console.warn('Weather service fetch error:', error);
     return null;

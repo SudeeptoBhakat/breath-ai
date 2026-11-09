@@ -34,26 +34,40 @@ export const LocationComparator: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     comparedCities.forEach((item, index) => {
       if (!item.data && item.loading) {
         fetchAirQualityData(item.location.latitude, item.location.longitude)
           .then(res => {
+            if (!isMounted) return;
             setComparedCities(prev => {
-              const copy = [...prev];
-              copy[index] = { ...copy[index], data: res.current, loading: false };
-              return copy;
+              if (prev[index] && prev[index].location.name === item.location.name) {
+                const copy = [...prev];
+                copy[index] = { ...copy[index], data: res.current, loading: false };
+                return copy;
+              }
+              return prev;
             });
           })
           .catch(() => {
+            if (!isMounted) return;
             setComparedCities(prev => {
-              const copy = [...prev];
-              copy[index] = { ...copy[index], loading: false, error: 'Failed to fetch' };
-              return copy;
+              if (prev[index] && prev[index].location.name === item.location.name) {
+                const copy = [...prev];
+                copy[index] = { ...copy[index], loading: false, error: 'Failed to fetch' };
+                return copy;
+              }
+              return prev;
             });
           });
       }
     });
-  }, [comparedCities]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [comparedCities.map(c => `${c.location.name}-${c.loading}`).join(',')]);
 
   const handleAddCity = (loc: LocationData) => {
     if (comparedCities.some(c => c.location.name === loc.name)) return;

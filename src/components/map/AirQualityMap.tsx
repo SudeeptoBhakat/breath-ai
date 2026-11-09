@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useAirQuality } from '../../context/AirQualityContext';
 import { searchLocations, reverseGeocode } from '../../services/geocodingService';
 import { fetchWaqiStation, getWaqiTileUrl } from '../../services/waqiService';
@@ -78,6 +79,7 @@ export const AirQualityMap: React.FC = () => {
   const [mapSearch, setMapSearch] = useState('');
   const [mapResults, setMapResults] = useState<LocationData[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const mapSearchTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [sampledLocation, setSampledLocation] = useState<LocationData | null>(null);
   const [sampledWaqi, setSampledWaqi] = useState<any | null>(null);
   const [isSampling, setIsSampling] = useState(false);
@@ -125,16 +127,21 @@ export const AirQualityMap: React.FC = () => {
     }
   };
 
-  const handleMapSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMapSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setMapSearch(val);
+    if (mapSearchTimeoutRef.current) clearTimeout(mapSearchTimeoutRef.current);
+
     if (val.trim().length >= 2) {
       setIsSearching(true);
-      const res = await searchLocations(val);
-      setMapResults(res);
-      setIsSearching(false);
+      mapSearchTimeoutRef.current = setTimeout(async () => {
+        const res = await searchLocations(val);
+        setMapResults(res);
+        setIsSearching(false);
+      }, 250);
     } else {
       setMapResults([]);
+      setIsSearching(false);
     }
   };
 

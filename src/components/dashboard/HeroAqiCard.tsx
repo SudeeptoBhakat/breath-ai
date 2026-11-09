@@ -25,24 +25,24 @@ interface HeroAqiCardProps {
 const getConditionVisual = (weatherCode: number, aqi: number) => {
   if (aqi > 150) {
     return {
-      image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1800&q=85',
+      image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=900&q=70',
       label: 'Urban air conditions'
     };
   }
   if (weatherCode >= 51) {
     return {
-      image: 'https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=1800&q=85',
+      image: 'https://images.unsplash.com/photo-1499346030926-9a72daac6c63?auto=format&fit=crop&w=900&q=70',
       label: 'Rain and cloud cover'
     };
   }
   if (weatherCode >= 45) {
     return {
-      image: 'https://images.unsplash.com/photo-1485236715568-ddc5ee6ca227?auto=format&fit=crop&w=1800&q=85',
+      image: 'https://images.unsplash.com/photo-1485236715568-ddc5ee6ca227?auto=format&fit=crop&w=900&q=70',
       label: 'Low visibility conditions'
     };
   }
   return {
-    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1800&q=85',
+    image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=70',
     label: 'Clear outdoor conditions'
   };
 };
@@ -89,6 +89,8 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
         <img
           src={conditionVisual.image}
           alt={conditionVisual.label}
+          loading="lazy"
+          decoding="async"
           className="city-hero-image absolute inset-0 w-full h-full object-cover"
         />
         <div className="city-hero-image-overlay absolute inset-0 pointer-events-none" />

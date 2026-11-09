@@ -28,7 +28,7 @@ export const CleanAirFinder: React.FC = () => {
       estimatedAqi: 52,
       whyClean: 'Himalayan mountain updrafts and elevation rise above the winter inversion smog layer.',
       approxDistanceKm: 240,
-      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=900&q=85'
+      image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=70'
     },
     {
       name: 'Shimla Heights',
@@ -39,7 +39,7 @@ export const CleanAirFinder: React.FC = () => {
       estimatedAqi: 35,
       whyClean: 'Alpine pine forest canopy and high-altitude mountain winds above surface smoke.',
       approxDistanceKm: 340,
-      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=85'
+      image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=70'
     },
     {
       name: 'Panchgani / Mahabaleshwar',
@@ -50,7 +50,7 @@ export const CleanAirFinder: React.FC = () => {
       estimatedAqi: 44,
       whyClean: 'Western Ghats foliage and coastal mountain breeze ventilation corridor.',
       approxDistanceKm: 260,
-      image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=85'
+      image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=70'
     },
     {
       name: 'Coorg (Madikeri)',
@@ -61,7 +61,7 @@ export const CleanAirFinder: React.FC = () => {
       estimatedAqi: 28,
       whyClean: 'Extensive rainforest canopy, coffee plantations, and zero industrial combustion.',
       approxDistanceKm: 250,
-      image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=85'
+      image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=70'
     },
     {
       name: 'Ooty (Nilgiris)',
@@ -72,7 +72,7 @@ export const CleanAirFinder: React.FC = () => {
       estimatedAqi: 30,
       whyClean: 'High-altitude Nilgiri plateau with pristine unpolluted air currents.',
       approxDistanceKm: 270,
-      image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=85'
+      image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=600&q=70'
     }
   ];
 
@@ -121,7 +121,7 @@ export const CleanAirFinder: React.FC = () => {
               className="group overflow-hidden rounded-2xl bg-[#EEF1E8]/40 border border-[#E3E6DC] flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-card"
             >
               <div className="relative h-36 overflow-hidden">
-                <img src={spot.image} alt={`${spot.name} landscape`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                <img src={spot.image} alt={`${spot.name} landscape`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" decoding="async" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#173D32]/55 via-transparent to-transparent" />
                 <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-white/90 text-[#173D32] backdrop-blur-sm font-mono">~{spot.estimatedAqi} AQI</span>
               </div>

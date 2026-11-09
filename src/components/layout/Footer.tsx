@@ -4,10 +4,11 @@ import { ArrowUpRight, Leaf, ShieldCheck, Wind } from 'lucide-react';
 export const Footer: React.FC = () => (
   <footer className="footer-atmosphere relative mt-20 bg-[#173D32] text-[#F7F5ED] overflow-hidden">
     <img
-      src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=2200&q=85"
+      src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=70"
       alt="Forest canopy in soft light"
       className="footer-atmosphere-image absolute inset-0 w-full h-full object-cover"
       loading="lazy"
+      decoding="async"
     />
     <div className="footer-atmosphere-overlay absolute inset-0 pointer-events-none" />
     <div className="relative max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 pt-14 pb-7">

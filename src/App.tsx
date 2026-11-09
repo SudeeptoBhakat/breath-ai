@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { AirQualityProvider, useAirQuality } from './context/AirQualityContext';
 import { AlertProvider } from './context/AlertContext';
 import { Navbar } from './components/layout/Navbar';
@@ -8,15 +8,26 @@ import { HeroAqiCard } from './components/dashboard/HeroAqiCard';
 import { PollutantGrid } from './components/dashboard/PollutantGrid';
 import { WeatherCard } from './components/dashboard/WeatherCard';
 import { AirQualityMap } from './components/map/AirQualityMap';
-import { HistoricalTracker } from './components/analytics/HistoricalTracker';
-import { ForecastView } from './components/analytics/ForecastView';
-import { LocationComparator } from './components/comparison/LocationComparator';
-import { HealthAdvisoryCard } from './components/health/HealthAdvisoryCard';
-import { PollutionLeaderboard } from './components/bonus/PollutionLeaderboard';
-import { CleanAirFinder } from './components/bonus/CleanAirFinder';
-import { BreatheAiChat } from './components/bonus/BreatheAiChat';
-import { SmartAlertModal } from './components/bonus/SmartAlertModal';
-import { ShareCardModal } from './components/bonus/ShareCardModal';
+
+// Lazy-load non-initial tabs and heavy modals to keep the initial JS bundle ultra-fast
+const HistoricalTracker = lazy(() => import('./components/analytics/HistoricalTracker').then(m => ({ default: m.HistoricalTracker })));
+const ForecastView = lazy(() => import('./components/analytics/ForecastView').then(m => ({ default: m.ForecastView })));
+const LocationComparator = lazy(() => import('./components/comparison/LocationComparator').then(m => ({ default: m.LocationComparator })));
+const PollutionLeaderboard = lazy(() => import('./components/bonus/PollutionLeaderboard').then(m => ({ default: m.PollutionLeaderboard })));
+const HealthAdvisoryCard = lazy(() => import('./components/health/HealthAdvisoryCard').then(m => ({ default: m.HealthAdvisoryCard })));
+const CleanAirFinder = lazy(() => import('./components/bonus/CleanAirFinder').then(m => ({ default: m.CleanAirFinder })));
+const BreatheAiChat = lazy(() => import('./components/bonus/BreatheAiChat').then(m => ({ default: m.BreatheAiChat })));
+const SmartAlertModal = lazy(() => import('./components/bonus/SmartAlertModal').then(m => ({ default: m.SmartAlertModal })));
+const ShareCardModal = lazy(() => import('./components/bonus/ShareCardModal').then(m => ({ default: m.ShareCardModal })));
+
+const TabSuspenseFallback: React.FC = () => (
+  <div className="bg-white border border-[#E3E6DC] rounded-3xl p-12 shadow-card flex flex-col items-center justify-center min-h-[380px] space-y-4">
+    <div className="w-9 h-9 rounded-full border-3 border-[#173D32] border-t-transparent animate-spin" />
+    <p className="text-xs font-semibold text-[#58645C] font-heading tracking-wide">
+      Loading analytics telemetry...
+    </p>
+  </div>
+);
 
 const AppContent: React.FC = () => {
   const { activeTab, currentData } = useAirQuality();
@@ -71,29 +82,49 @@ const AppContent: React.FC = () => {
         )}
 
         {activeTab === 'history' && (
-          <div className="space-y-10 animate-enter">
-            <HistoricalTracker />
-            <ForecastView />
-          </div>
+          <Suspense fallback={<TabSuspenseFallback />}>
+            <div className="space-y-10 animate-enter">
+              <HistoricalTracker />
+              <ForecastView />
+            </div>
+          </Suspense>
         )}
+
         {activeTab === 'comparison' && (
-          <div className="space-y-10 animate-enter">
-            <LocationComparator />
-            <PollutionLeaderboard />
-          </div>
+          <Suspense fallback={<TabSuspenseFallback />}>
+            <div className="space-y-10 animate-enter">
+              <LocationComparator />
+              <PollutionLeaderboard />
+            </div>
+          </Suspense>
         )}
+
         {activeTab === 'health' && (
-          <div className="space-y-10 animate-enter">
-            <HealthAdvisoryCard />
-            <CleanAirFinder />
-          </div>
+          <Suspense fallback={<TabSuspenseFallback />}>
+            <div className="space-y-10 animate-enter">
+              <HealthAdvisoryCard />
+              <CleanAirFinder />
+            </div>
+          </Suspense>
         )}
       </main>
 
-      {/* Interactive Modals */}
-      <BreatheAiChat isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} />
-      <SmartAlertModal isOpen={isAlertOpen} onClose={() => setIsAlertOpen(false)} />
-      <ShareCardModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
+      {/* Interactive Modals (mounted lazily on demand) */}
+      {isAiOpen && (
+        <Suspense fallback={null}>
+          <BreatheAiChat isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} />
+        </Suspense>
+      )}
+      {isAlertOpen && (
+        <Suspense fallback={null}>
+          <SmartAlertModal isOpen={isAlertOpen} onClose={() => setIsAlertOpen(false)} />
+        </Suspense>
+      )}
+      {isShareOpen && (
+        <Suspense fallback={null}>
+          <ShareCardModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
+        </Suspense>
+      )}
 
       {/* Deep Forest Green Footer */}
       <Footer />
