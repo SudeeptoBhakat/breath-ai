@@ -104,19 +104,19 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
           <div className="lg:col-span-7 space-y-4">
             
             {/* Organic Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EEF1E8] border border-[#A8B99A]/40 text-xs text-[#173D32]">
-              <span className="w-2 h-2 rounded-full bg-[#2D6A4F] animate-pulse" />
-              <span className="font-semibold font-heading">Live local air quality</span>
+            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EEF1E8] border border-[#A8B99A]/40 text-xs text-[#173D32]">
+              <span className="w-2 h-2 rounded-full bg-[#2D6A4F] animate-pulse" /> */}
+              {/* <span className="font-semibold font-heading">Live local air quality</span>
               <span className="text-[#89938A]">•</span>
-              <span className="text-[#58645C] text-[11px]">Updated from available stations</span>
-            </div>
+              <span className="text-[#58645C] text-[11px]">Updated from available stations</span> */}
+            {/* </div> */}
 
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-white/70 text-[11px] text-[#173D32] backdrop-blur-md">
+            {/* <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/60 border border-white/70 text-[11px] text-[#173D32] backdrop-blur-md">
               <Thermometer className="w-3.5 h-3.5 text-[#8B5E3C]" />
               <span className="font-semibold">{weatherData?.temperature ?? 26}°C</span>
               <span className="opacity-40">•</span>
               <span>{weatherData?.weatherDescription ?? 'Local conditions'}</span>
-            </div>
+            </div> */}
 
             {/* Editorial Main Headline (Manrope 700/800) */}
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading text-[#173D32] tracking-tight leading-[1.15]">
@@ -142,10 +142,10 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
                 Updated {formatDateTime(lastUpdated)}
               </span>
 
-              <span className="inline-flex items-center gap-1 text-[11px] text-[#89938A] hidden sm:inline-flex">
+              {/* <span className="inline-flex items-center gap-1 text-[11px] text-[#89938A] hidden sm:inline-flex">
                 <ShieldCheck className="w-3 h-3 text-[#2D6A4F]" />
                 Source-aware monitoring
-              </span>
+              </span> */}
             </div>
 
             {/* CTAs: Solid Forest Green CTA + Secondary Outline CTA */}

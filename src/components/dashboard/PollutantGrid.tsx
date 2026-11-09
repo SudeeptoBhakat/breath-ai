@@ -28,10 +28,6 @@ export const PollutantGrid: React.FC = () => {
           </p>
         </div>
 
-        <div className="text-[11px] text-[#89938A] flex items-center gap-1.5 font-medium">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#2D6A4F]" />
-          <span>Click any card for clinical health mechanisms</span>
-        </div>
       </div>
 
       {/* Grid of Pollutants: 14-20px radius, white/soft surface, thin border */}

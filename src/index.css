@@ -614,3 +614,105 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 
 .scrollbar-none::-webkit-scrollbar { display: none; }
 .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Google Weather App Style Animations ───────────────────────────── */
+@keyframes cloudDriftSlow {
+  0% {
+    transform: translateX(-160px);
+  }
+  100% {
+    transform: translateX(calc(100% + 200px));
+  }
+}
+
+@keyframes cloudDriftMedium {
+  0% {
+    transform: translateX(-220px);
+  }
+  100% {
+    transform: translateX(calc(100% + 250px));
+  }
+}
+
+@keyframes cloudDriftFast {
+  0% {
+    transform: translateX(-120px);
+  }
+  100% {
+    transform: translateX(calc(100% + 180px));
+  }
+}
+
+@keyframes sunPulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 20px rgba(253, 224, 71, 0.6)) drop-shadow(0 0 50px rgba(245, 158, 11, 0.4));
+  }
+  50% {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 35px rgba(253, 224, 71, 0.85)) drop-shadow(0 0 75px rgba(245, 158, 11, 0.6));
+  }
+}
+
+@keyframes sunRaysSlowSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes raindropFall {
+  0% {
+    transform: translateY(-20px) translateX(-5px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(160px) translateX(-15px);
+    opacity: 0;
+  }
+}
+
+@keyframes starTwinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.animate-cloud-slow {
+  animation: cloudDriftSlow 48s linear infinite;
+}
+
+.animate-cloud-medium {
+  animation: cloudDriftMedium 32s linear infinite;
+}
+
+.animate-cloud-fast {
+  animation: cloudDriftFast 24s linear infinite;
+}
+
+.animate-sun-pulse {
+  animation: sunPulseGlow 4s ease-in-out infinite;
+}
+
+.animate-sun-rays {
+  animation: sunRaysSlowSpin 40s linear infinite;
+}
+
+.animate-raindrop {
+  animation: raindropFall 1.2s linear infinite;
+}
+
+.animate-star {
+  animation: starTwinkle 2.5s ease-in-out infinite;
+}
+

@@ -8,6 +8,8 @@ import { HeroAqiCard } from './components/dashboard/HeroAqiCard';
 import { PollutantGrid } from './components/dashboard/PollutantGrid';
 import { WeatherCard } from './components/dashboard/WeatherCard';
 import { AirQualityMap } from './components/map/AirQualityMap';
+import { ShareCardModal } from './components/bonus/ShareCardModal';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
 
 // Lazy-load non-initial tabs and heavy modals to keep the initial JS bundle ultra-fast
 const HistoricalTracker = lazy(() => import('./components/analytics/HistoricalTracker').then(m => ({ default: m.HistoricalTracker })));
@@ -18,7 +20,6 @@ const HealthAdvisoryCard = lazy(() => import('./components/health/HealthAdvisory
 const CleanAirFinder = lazy(() => import('./components/bonus/CleanAirFinder').then(m => ({ default: m.CleanAirFinder })));
 const BreatheAiChat = lazy(() => import('./components/bonus/BreatheAiChat').then(m => ({ default: m.BreatheAiChat })));
 const SmartAlertModal = lazy(() => import('./components/bonus/SmartAlertModal').then(m => ({ default: m.SmartAlertModal })));
-const ShareCardModal = lazy(() => import('./components/bonus/ShareCardModal').then(m => ({ default: m.ShareCardModal })));
 
 const TabSuspenseFallback: React.FC = () => (
   <div className="bg-white border border-[#E3E6DC] rounded-3xl p-12 shadow-card flex flex-col items-center justify-center min-h-[380px] space-y-4">
@@ -50,7 +51,7 @@ const AppContent: React.FC = () => {
     >
 
       {/* Top Notification Banner */}
-      <DiwaliBanner />
+      {/* <DiwaliBanner /> */}
 
       {/* Primary Sticky Header */}
       <Navbar
@@ -121,9 +122,9 @@ const AppContent: React.FC = () => {
         </Suspense>
       )}
       {isShareOpen && (
-        <Suspense fallback={null}>
+        <ErrorBoundary>
           <ShareCardModal isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
-        </Suspense>
+        </ErrorBoundary>
       )}
 
       {/* Deep Forest Green Footer */}
@@ -134,11 +135,13 @@ const AppContent: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <AlertProvider>
-      <AirQualityProvider>
-        <AppContent />
-      </AirQualityProvider>
-    </AlertProvider>
+    <ErrorBoundary>
+      <AlertProvider>
+        <AirQualityProvider>
+          <AppContent />
+        </AirQualityProvider>
+      </AlertProvider>
+    </ErrorBoundary>
   );
 };
 
