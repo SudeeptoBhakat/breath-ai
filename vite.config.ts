@@ -9,18 +9,25 @@ interface LocalBreatheRequest {
   history?: Array<{ sender?: 'user' | 'assistant'; text?: string }>;
 }
 
-const localBreatheAiProxy = (apiKey?: string, model?: string): Plugin => ({
+interface ProxyConfig {
+  groqKey?: string;
+  groqModel?: string;
+  geminiKey?: string;
+  ollamaKey?: string;
+  ollamaBase?: string;
+  ollamaModel?: string;
+  llamaKey?: string;
+  llamaBase?: string;
+  llamaModel?: string;
+}
+
+const localBreatheAiProxy = (cfg: ProxyConfig): Plugin => ({
   name: 'local-breathe-ai-proxy',
   configureServer(server) {
     server.middlewares.use('/api/breathe-ai', async (request, response) => {
       if (request.method !== 'POST') {
         response.statusCode = 405;
         response.end(JSON.stringify({ error: 'Method not allowed.' }));
-        return;
-      }
-      if (!apiKey) {
-        response.statusCode = 503;
-        response.end(JSON.stringify({ error: 'GROQ_LLM_API_KEY is missing from .env. Restart Vite after adding it.' }));
         return;
       }
 
@@ -34,7 +41,11 @@ const localBreatheAiProxy = (apiKey?: string, model?: string): Plugin => ({
         });
         const payload = JSON.parse(body) as LocalBreatheRequest;
         const message = payload.message?.trim();
-        if (!message) throw new Error('Message is required.');
+        if (!message) {
+          response.statusCode = 400;
+          response.end(JSON.stringify({ error: 'Message is required.' }));
+          return;
+        }
 
         const air = payload.air ?? {};
         const location = payload.location?.name || 'your selected location';
@@ -43,27 +54,116 @@ const localBreatheAiProxy = (apiKey?: string, model?: string): Plugin => ({
         const history = (payload.history ?? [])
           .filter(turn => (turn.sender === 'user' || turn.sender === 'assistant') && typeof turn.text === 'string')
           .slice(-8)
-          .map(turn => ({ role: turn.sender, content: turn.text!.slice(0, 1800) }));
-        const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-          body: JSON.stringify({
-            model: model || 'qwen/qwen3.8-27b',
-            messages: [{ role: 'system', content: system }, ...history, { role: 'user', content: message }],
-            temperature: 0.65,
-            max_tokens: 360
-          })
-        });
-        const upstreamBody = await upstream.text();
-        response.setHeader('content-type', 'application/json; charset=utf-8');
-        response.statusCode = upstream.ok ? 200 : 502;
-        if (!upstream.ok) {
-          console.error('Local Groq proxy error:', upstream.status);
-          response.end(JSON.stringify({ error: 'Groq is temporarily unavailable.' }));
-          return;
+          .map(turn => ({ role: turn.sender === 'assistant' ? 'assistant' : 'user', content: turn.text!.slice(0, 1800) }));
+
+        let reply: string | null = null;
+
+        // 1. Try Groq
+        if (cfg.groqKey) {
+          try {
+            const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              method: 'POST',
+              headers: { authorization: `Bearer ${cfg.groqKey}`, 'content-type': 'application/json' },
+              body: JSON.stringify({
+                model: cfg.groqModel || 'qwen/qwen3.8-27b',
+                messages: [{ role: 'system', content: system }, ...history, { role: 'user', content: message }],
+                temperature: 0.65,
+                max_tokens: 360
+              })
+            });
+            if (upstream.ok) {
+              const data = await upstream.json() as { choices?: Array<{ message?: { content?: string } }> };
+              reply = data.choices?.[0]?.message?.content?.trim() || null;
+            }
+          } catch (e) {
+            console.warn('Vite proxy Groq attempt failed:', e);
+          }
         }
-        const data = JSON.parse(upstreamBody) as { choices?: Array<{ message?: { content?: string } }> };
-        response.end(JSON.stringify({ reply: data.choices?.[0]?.message?.content?.trim() || 'I could not generate a response.' }));
+
+        // 2. Try Gemini
+        if (!reply && cfg.geminiKey) {
+          const geminiModels = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite'];
+          for (const m of geminiModels) {
+            try {
+              const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${cfg.geminiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  systemInstruction: { parts: [{ text: system }] },
+                  contents: [
+                    ...history.map(h => ({ role: h.role === 'assistant' ? 'model' : 'user', parts: [{ text: h.content }] })),
+                    { role: 'user', parts: [{ text: message }] }
+                  ],
+                  generationConfig: { maxOutputTokens: 360, temperature: 0.65 }
+                })
+              });
+              if (geminiRes.ok) {
+                const geminiData = await geminiRes.json();
+                reply = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
+                if (reply) break;
+              }
+            } catch (e) {
+              console.warn(`Vite proxy Gemini ${m} attempt failed:`, e);
+            }
+          }
+        }
+
+        // 3. Try Ollama Fallback Safety (https://ollama.com/v1)
+        if (!reply && cfg.ollamaKey) {
+          try {
+            const baseUrl = (cfg.ollamaBase || 'https://ollama.com/v1').replace(/\/+$/, '');
+            const url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+            const ollamaRes = await fetch(url, {
+              method: 'POST',
+              headers: { authorization: `Bearer ${cfg.ollamaKey}`, 'content-type': 'application/json' },
+              body: JSON.stringify({
+                model: cfg.ollamaModel || 'deepseek-v4.1-flash',
+                messages: [{ role: 'system', content: system }, ...history, { role: 'user', content: message }],
+                temperature: 0.65,
+                max_tokens: 360
+              })
+            });
+            if (ollamaRes.ok) {
+              const data = await ollamaRes.json() as { choices?: Array<{ message?: { content?: string } }> };
+              reply = data.choices?.[0]?.message?.content?.trim() || null;
+            }
+          } catch (e) {
+            console.warn('Vite proxy Ollama attempt failed:', e);
+          }
+        }
+
+        // 4. Try Custom Llama / OpenAI-compatible endpoint
+        if (!reply && cfg.llamaKey) {
+          try {
+            const baseUrl = (cfg.llamaBase || 'https://api.groq.com/openai/v1').replace(/\/+$/, '');
+            const url = baseUrl.endsWith('/chat/completions') ? baseUrl : `${baseUrl}/chat/completions`;
+            const llamaRes = await fetch(url, {
+              method: 'POST',
+              headers: { authorization: `Bearer ${cfg.llamaKey}`, 'content-type': 'application/json' },
+              body: JSON.stringify({
+                model: cfg.llamaModel || 'llama-3.3-70b-versatile',
+                messages: [{ role: 'system', content: system }, ...history, { role: 'user', content: message }],
+                temperature: 0.65,
+                max_tokens: 360
+              })
+            });
+            if (llamaRes.ok) {
+              const data = await llamaRes.json() as { choices?: Array<{ message?: { content?: string } }> };
+              reply = data.choices?.[0]?.message?.content?.trim() || null;
+            }
+          } catch (e) {
+            console.warn('Vite proxy Llama attempt failed:', e);
+          }
+        }
+
+        response.setHeader('content-type', 'application/json; charset=utf-8');
+        if (reply) {
+          response.statusCode = 200;
+          response.end(JSON.stringify({ reply }));
+        } else {
+          response.statusCode = 502;
+          response.end(JSON.stringify({ error: 'All upstream AI services unavailable.' }));
+        }
       } catch (error) {
         console.error('Local BreatheAI proxy error:', error);
         response.statusCode = 500;
@@ -76,11 +176,22 @@ const localBreatheAiProxy = (apiKey?: string, model?: string): Plugin => ({
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // The empty prefix makes the server-only GROQ_LLM_API_KEY available to Vite's
-  // Node process without exposing it to browser code.
   const env = loadEnv(mode, process.cwd(), '');
   return {
-    plugins: [react(), localBreatheAiProxy(env.GROQ_LLM_API_KEY, env.GROQ_MODEL)],
+    plugins: [
+      react(),
+      localBreatheAiProxy({
+        groqKey: env.GROQ_LLM_API_KEY || env.VITE_GROQ_API_KEY,
+        groqModel: env.GROQ_MODEL || 'qwen/qwen3.8-27b',
+        geminiKey: env.VITE_GEMINI_API_KEY,
+        ollamaKey: env.OLLAMA_API_KEY || env.VITE_OLLAMA_API_KEY,
+        ollamaBase: env.OLLAMA_BASE_URL || env.VITE_OLLAMA_BASE_URL,
+        ollamaModel: env.OLLAMA_MODEL || env.VITE_OLLAMA_MODEL,
+        llamaKey: env.VITE_LLAMA_API_KEY || env.LLAMA_API_KEY,
+        llamaBase: env.VITE_LLAMA_BASE_URL,
+        llamaModel: env.VITE_LLAMA_MODEL
+      })
+    ],
     server: {
       port: 3000,
       host: true,
