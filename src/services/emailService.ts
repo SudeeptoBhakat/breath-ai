@@ -38,8 +38,23 @@ export async function sendAqiAlertEmail(payload: SendAlertEmailPayload): Promise
     });
 
     if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      const errorMsg = errData.error || `HTTP ${res.status}: Failed to send alert email.`;
+      let errorMsg = `HTTP ${res.status}: Failed to send alert email.`;
+      try {
+        const text = await res.text();
+        try {
+          const errData = JSON.parse(text);
+          errorMsg = errData.error || errData.details || errorMsg;
+          if (errData.details && errData.error && errData.details !== errData.error) {
+            errorMsg = `${errData.error} (${errData.details})`;
+          }
+        } catch {
+          if (text) {
+            errorMsg = `Server error (${res.status}): ${text.slice(0, 150)}`;
+          }
+        }
+      } catch {
+        // use default errorMsg
+      }
       logger.warn('Send alert email failed:', errorMsg);
       return { success: false, error: errorMsg };
     }
