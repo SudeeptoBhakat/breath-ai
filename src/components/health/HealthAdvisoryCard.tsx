@@ -12,7 +12,8 @@ import {
   Leaf,
   ShoppingBag,
   TreePine,
-  PlayCircle
+  PlayCircle,
+  ExternalLink
 } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -235,37 +236,59 @@ export const HealthAdvisoryCard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <article className="overflow-hidden rounded-2xl border border-[#E3E6DC] bg-[#EEF1E8]/40">
+          <article className="overflow-hidden rounded-2xl border border-[#E3E6DC] bg-[#EEF1E8]/40 flex flex-col justify-between">
             <div className="aspect-video bg-[#173D32]">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/HKyLG5at4jg?si=MEEXkSeVmDUfXRV1"
+                src="https://www.youtube.com/embed/HKyLG5at4jg"
                 title="Delhi Air Pollution: How to Protect Yourself from Smog & Poor AQI? | Dr. Aarti Vashisht"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
               />
             </div>
-            <div className="p-4">
-              <h4 className="font-semibold font-heading text-sm text-[#173D32]">Protect yourself from smog & poor AQI</h4>
-              <p className="mt-1 text-xs leading-relaxed text-[#58645C]">A doctor-led overview of reducing exposure during high-pollution conditions in Delhi.</p>
+            <div className="p-4 flex items-center justify-between gap-3">
+              <div>
+                <h4 className="font-semibold font-heading text-sm text-[#173D32]">Protect yourself from smog & poor AQI</h4>
+                <p className="mt-1 text-xs leading-relaxed text-[#58645C]">A doctor-led overview of reducing exposure during high-pollution conditions in Delhi.</p>
+              </div>
+              <a
+                href="https://www.youtube.com/watch?v=HKyLG5at4jg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 p-2 text-[#58645C] hover:text-[#173D32] hover:bg-white rounded-lg transition-colors border border-transparent hover:border-[#E3E6DC]"
+                title="Watch on YouTube"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
           </article>
 
-          <article className="overflow-hidden rounded-2xl border border-[#E3E6DC] bg-[#EEF1E8]/40">
+          <article className="overflow-hidden rounded-2xl border border-[#E3E6DC] bg-[#EEF1E8]/40 flex flex-col justify-between">
             <div className="aspect-video bg-[#173D32]">
               <iframe
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/yNnb_F1MqvE?si=NtIy7qQJnLCF7qk1"
+                src="https://www.youtube.com/embed/yNnb_F1MqvE"
                 title="How to Protect Yourself From Bad Air Quality"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
               />
             </div>
-            <div className="p-4">
-              <h4 className="font-semibold font-heading text-sm text-[#173D32]">How to protect yourself from bad air quality</h4>
-              <p className="mt-1 text-xs leading-relaxed text-[#58645C]">Clear everyday habits for home, commuting, and outdoor activity when the air is poor.</p>
+            <div className="p-4 flex items-center justify-between gap-3">
+              <div>
+                <h4 className="font-semibold font-heading text-sm text-[#173D32]">How to protect yourself from bad air quality</h4>
+                <p className="mt-1 text-xs leading-relaxed text-[#58645C]">Clear everyday habits for home, commuting, and outdoor activity when the air is poor.</p>
+              </div>
+              <a
+                href="https://www.youtube.com/watch?v=yNnb_F1MqvE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 p-2 text-[#58645C] hover:text-[#173D32] hover:bg-white rounded-lg transition-colors border border-transparent hover:border-[#E3E6DC]"
+                title="Watch on YouTube"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
           </article>
         </div>

@@ -26,7 +26,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; connect-src 'self' https://air-quality-api.open-meteo.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://api.waqi.info https://tiles.aqicn.org https://nominatim.openstreetmap.org https://generativelanguage.googleapis.com https://api.groq.com https://ollama.com https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob: https://images.unsplash.com https://tiles.aqicn.org https://*.tile.openstreetmap.org; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-ancestors 'none';"
+          "value": "default-src 'self'; connect-src 'self' https://air-quality-api.open-meteo.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://api.waqi.info https://tiles.aqicn.org https://nominatim.openstreetmap.org https://generativelanguage.googleapis.com https://api.groq.com https://ollama.com https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob: https://images.unsplash.com https://tiles.aqicn.org https://*.tile.openstreetmap.org https://i.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com; frame-ancestors 'none';"
         }
       ]
     }
