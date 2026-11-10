@@ -23,6 +23,7 @@ import {
   Moon
 } from 'lucide-react';
 import { useAirQuality, ActiveTab } from '../../context/AirQualityContext';
+import { useAlerts } from '../../context/AlertContext';
 import { searchLocations, PRESET_CITIES } from '../../services/geocodingService';
 import { LocationData } from '../../types/aqi';
 import { useLanguage } from '../../context/LanguageContext';
@@ -31,6 +32,8 @@ import { LanguageSelector } from './LanguageSelector';
 interface NavbarProps {
   onOpenAiChat: () => void;
   onOpenAlertModal: () => void;
+  onOpenNotifications: () => void;
+  onOpenSavedLocations: () => void;
   onOpenShareModal: () => void;
   theme: 'light' | 'dark';
   onToggleTheme: () => void;
@@ -39,6 +42,8 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenAiChat,
   onOpenAlertModal,
+  onOpenNotifications,
+  onOpenSavedLocations,
   onOpenShareModal,
   theme,
   onToggleTheme
@@ -51,9 +56,12 @@ export const Navbar: React.FC<NavbarProps> = ({
     locateMe,
     isLocating,
     currentData,
+    favorites,
     isFavorite,
     toggleFavorite
   } = useAirQuality();
+
+  const { unreadCount } = useAlerts();
 
   const { t } = useLanguage();
 
@@ -186,6 +194,46 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                 ) : (
                   <div className="py-2">
+                    {favorites.length > 0 && (
+                      <div className="pb-2 mb-2 border-b border-[#E3E6DC]">
+                        <div className="px-4 py-1.5 text-[10px] font-bold text-[#8B5E3C] uppercase tracking-wider flex items-center justify-between">
+                          <span>⭐ Your Saved Locations ({favorites.length})</span>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsOpenDropdown(false);
+                              onOpenSavedLocations();
+                            }}
+                            className="text-[10px] text-[#173D32] hover:underline font-semibold font-heading"
+                          >
+                            Manage All
+                          </button>
+                        </div>
+                        {favorites.slice(0, 5).map((loc) => (
+                          <button
+                            key={loc.id || loc.name}
+                            onClick={() => handleSelectLocation({
+                              id: loc.id,
+                              name: loc.name,
+                              displayName: loc.displayName,
+                              latitude: loc.latitude,
+                              longitude: loc.longitude,
+                              country: loc.country,
+                              countryCode: ''
+                            })}
+                            className="w-full text-left px-4 py-2 hover:bg-[#EEF1E8] flex items-center justify-between text-xs transition-colors"
+                          >
+                            <span className="text-[#173D32] font-semibold flex items-center gap-1.5">
+                              <BookmarkCheck className="w-3.5 h-3.5 text-[#8B5E3C]" />
+                              <span>{loc.name}</span>
+                            </span>
+                            <span className="text-[#89938A] text-[10px] font-mono">{loc.country}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="px-4 py-1.5 text-[10px] font-bold text-[#89938A] uppercase tracking-wider">
                       Popular Monitored Metros
                     </div>
@@ -222,26 +270,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="hidden lg:inline text-[#26332D] font-heading">{t('nav.locate')}</span>
             </button>
 
-            {/* Favorite Bookmark */}
+            {/* Saved Locations Button */}
             <button
-              onClick={toggleFavorite}
-              title={isFavorite ? t('nav.saved') : t('nav.saveLocation')}
-              className="hidden sm:block p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors"
+              onClick={onOpenSavedLocations}
+              title={`View Saved Locations (${favorites.length})`}
+              aria-label="View Saved Locations"
+              className="p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors relative flex items-center gap-1"
             >
-              {isFavorite ? (
-                <BookmarkCheck className="w-4 h-4 text-[#8B5E3C]" />
-              ) : (
-                <Bookmark className="w-4 h-4" />
+              <BookmarkCheck className={`w-4 h-4 ${favorites.length > 0 ? 'text-[#8B5E3C]' : ''}`} />
+              {favorites.length > 0 && (
+                <span className="text-[11px] font-mono font-bold text-[#173D32]">
+                  {favorites.length}
+                </span>
               )}
             </button>
 
-            {/* Alerts */}
+            {/* Notification Center with Unread Counter Badge */}
             <button
-              onClick={onOpenAlertModal}
-              title={t('nav.alerts')}
-              className="p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors"
+              onClick={onOpenNotifications}
+              title="Notifications & Alerts"
+              aria-label="Notifications & Alerts"
+              className="p-2.5 rounded-lg bg-white hover:bg-[#EEF1E8] text-[#58645C] hover:text-[#173D32] border border-[#E3E6DC] transition-colors relative"
             >
               <Bell className="w-4 h-4" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#C53030] text-white text-[9px] font-bold font-mono flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
 
             {/* Share Card */}

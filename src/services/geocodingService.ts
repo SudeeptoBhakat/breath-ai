@@ -1,4 +1,5 @@
 import { LocationData } from '../types/aqi';
+import { logger } from '../utils/logger';
 
 const GEOCODING_BASE_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 
@@ -159,7 +160,7 @@ export async function searchLocations(query: string): Promise<LocationData[]> {
     searchCache.set(q, results);
     return results;
   } catch (error) {
-    console.error('Failed to search locations:', error);
+    logger.error('Failed to search locations:', error);
     return [];
   }
 }
@@ -209,7 +210,7 @@ export async function reverseGeocode(latitude: number, longitude: number): Promi
       return result;
     }
   } catch (e) {
-    console.warn('Reverse geocode fallback:', e);
+    logger.warn('Reverse geocode fallback:', e);
   }
 
   // Graceful fallback

@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger';
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
@@ -20,7 +21,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.warn('BreatheAI ErrorBoundary caught an issue:', error, errorInfo);
+    logger.warn('BreatheAI ErrorBoundary caught an issue:', error, errorInfo);
   }
 
   public render() {
@@ -46,3 +47,6 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+
+

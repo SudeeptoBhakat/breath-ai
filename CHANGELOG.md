@@ -10,6 +10,33 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.5.0] — 2026-11-10
+
+### Added
+- **Saved Locations Management System**:
+  - `SavedLocationsModal`: full modal to inspect, switch, and remove saved cities with live AQI status badges.
+  - Navbar Bookmark button upgraded to display a live saved cities counter badge.
+  - Navbar search drawer now showcases a dedicated "⭐ Your Saved Locations" section with quick-switch and "Manage All" buttons.
+  - `HeroAqiCard`: added "Save City" button alongside live quick-switch chips for saved metropolitan monitors.
+- **Automated SMTP Email Alerts**:
+  - Secure serverless endpoint at `/api/send-alert-email` using `nodemailer`.
+  - Netlify function (`netlify/functions/send-alert-email.ts`), Vercel serverless function (`api/send-alert-email.ts`), and Vite dev-server proxy.
+  - Beautiful responsive HTML email template (`alertEmailTemplate.ts`) with live AQI badges, dominant pollutant metrics, physician health guidance, and 1-click telemetry links.
+  - SMTP credentials secured strictly in `.env` (server-side only, never leaked or committed to Git).
+  - "Test Email Alert" button in `SmartAlertModal` with live delivery confirmation.
+  - Automated background threshold detection: triggers email alerts when monitored air reaches unhealthy levels (> 150 AQI or custom threshold) with smart cooldown guards.
+- **Dedicated Notification Center**:
+  - `NotificationCenterModal`: centralized panel listing all real-time alerts, email dispatch confirmations, and winter smog trapping advisories.
+  - Unread badge counter on the Navbar Bell icon with real-time updates.
+  - "Mark all as read" and "Clear history" controls.
+  - Quick access shortcut to Alert Settings.
+- **Data Authenticity & Security**:
+  - Completely purged hardcoded AQI values in `PollutionLeaderboard` and `CleanAirFinder`; all ranks and retreats now query live Open-Meteo telemetry concurrently.
+  - Replaced all 26 production `console.*` calls with an environment-aware `logger.ts` utility.
+  - Implemented strict HTTP security headers (`Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Strict-Transport-Security`) in both `vercel.json` and `netlify.toml`.
+
+---
+
 ## [1.4.0] — 2026-11-09
 
 ### Added

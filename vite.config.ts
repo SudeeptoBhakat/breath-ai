@@ -1,5 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import nodemailer from 'nodemailer';
+import { generateAqiAlertHtml } from './src/utils/alertEmailTemplate';
 
 interface LocalBreatheRequest {
   message?: string;
@@ -8,6 +10,80 @@ interface LocalBreatheRequest {
   air?: { aqi?: number; category?: string; dominantPollutant?: string; pm25?: number; temperature?: number; windSpeed?: number };
   history?: Array<{ sender?: 'user' | 'assistant'; text?: string }>;
 }
+
+interface SmtpProxyConfig {
+  host?: string;
+  port?: string;
+  user?: string;
+  pass?: string;
+  from?: string;
+}
+
+const localEmailAlertProxy = (cfg: SmtpProxyConfig): Plugin => ({
+  name: 'local-email-alert-proxy',
+  configureServer(server) {
+    server.middlewares.use('/api/send-alert-email', async (request, response) => {
+      if (request.method !== 'POST') {
+        response.statusCode = 405;
+        response.end(JSON.stringify({ error: 'Method not allowed. Use POST.' }));
+        return;
+      }
+
+      try {
+        const body = await new Promise<string>((resolve, reject) => {
+          let raw = '';
+          request.setEncoding('utf8');
+          request.on('data', chunk => { raw += chunk; });
+          request.on('end', () => resolve(raw));
+          request.on('error', reject);
+        });
+
+        const payload = JSON.parse(body || '{}');
+        const toEmail = payload.toEmail?.trim();
+
+        if (!toEmail || !toEmail.includes('@')) {
+          response.statusCode = 400;
+          response.setHeader('content-type', 'application/json');
+          response.end(JSON.stringify({ error: 'Valid recipient email required.' }));
+          return;
+        }
+
+        const host = cfg.host || 'mail.thesoulmate.in';
+        const port = parseInt(cfg.port || '465', 10);
+        const user = cfg.user || 'no-reply@thesoulmate.in';
+        const pass = cfg.pass || '3122002@Riju';
+        const from = cfg.from || `"BreatheAI Alerts" <${user}>`;
+
+        const transporter = nodemailer.createTransport({
+          host,
+          port,
+          secure: port === 465,
+          auth: { user, pass },
+          tls: { rejectUnauthorized: false }
+        });
+
+        const { subject, html, text } = generateAqiAlertHtml(payload);
+
+        const info = await transporter.sendMail({
+          from,
+          to: toEmail,
+          subject,
+          text,
+          html
+        });
+
+        response.statusCode = 200;
+        response.setHeader('content-type', 'application/json');
+        response.end(JSON.stringify({ success: true, messageId: info.messageId, recipient: toEmail }));
+      } catch (err: any) {
+        console.error('Local email alert proxy error:', err);
+        response.statusCode = 500;
+        response.setHeader('content-type', 'application/json');
+        response.end(JSON.stringify({ error: 'Failed to send alert email via SMTP', details: err?.message }));
+      }
+    });
+  }
+});
 
 interface ProxyConfig {
   groqKey?: string;
@@ -190,6 +266,13 @@ export default defineConfig(({ mode }) => {
         llamaKey: env.VITE_LLAMA_API_KEY || env.LLAMA_API_KEY,
         llamaBase: env.VITE_LLAMA_BASE_URL,
         llamaModel: env.VITE_LLAMA_MODEL
+      }),
+      localEmailAlertProxy({
+        host: env.SMTP_HOST,
+        port: env.SMTP_PORT,
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+        from: env.SMTP_FROM
       })
     ],
     server: {

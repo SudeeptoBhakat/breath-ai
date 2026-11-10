@@ -17,8 +17,23 @@ export interface UserAlertSetting {
   longitude: number;
   thresholdAqi: number;
   notifyPm25: boolean;
+  notifyEmail?: boolean;
+  userEmail?: string;
   isActive: boolean;
   createdAt: string;
+}
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  type: 'danger' | 'warning' | 'info' | 'success';
+  aqi?: number;
+  locationName?: string;
+  isRead: boolean;
+  emailSent?: boolean;
+  recipientEmail?: string;
 }
 
 export interface CommunityAirReport {

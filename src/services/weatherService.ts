@@ -1,4 +1,5 @@
 import { getWeatherConditionName } from '../utils/formatters';
+import { logger } from '../utils/logger';
 
 const WEATHER_BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 
@@ -74,7 +75,7 @@ export async function fetchWeatherData(latitude: number, longitude: number): Pro
     weatherCache.set(cacheKey, { timestamp: Date.now(), data: result });
     return result;
   } catch (error) {
-    console.warn('Weather service fetch error:', error);
+    logger.warn('Weather service fetch error:', error);
     return null;
   }
 }

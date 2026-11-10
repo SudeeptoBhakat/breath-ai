@@ -1,6 +1,6 @@
 import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { AirQualityProvider, useAirQuality } from './context/AirQualityContext';
-import { AlertProvider } from './context/AlertContext';
+import { AlertProvider, useAlerts } from './context/AlertContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { Navbar } from './components/layout/Navbar';
 import { DiwaliBanner } from './components/layout/DiwaliBanner';
@@ -10,6 +10,8 @@ import { PollutantGrid } from './components/dashboard/PollutantGrid';
 import { WeatherCard } from './components/dashboard/WeatherCard';
 import { AirQualityMap } from './components/map/AirQualityMap';
 import { ShareCardModal } from './components/bonus/ShareCardModal';
+import { SavedLocationsModal } from './components/layout/SavedLocationsModal';
+import { NotificationCenterModal } from './components/layout/NotificationCenterModal';
 import { ErrorBoundary } from './components/layout/ErrorBoundary';
 
 // Lazy-load non-initial tabs and heavy modals to keep the initial JS bundle ultra-fast
@@ -32,9 +34,13 @@ const TabSuspenseFallback: React.FC = () => (
 );
 
 const AppContent: React.FC = () => {
-  const { activeTab, currentData } = useAirQuality();
+  const { activeTab, currentData, selectedLocation } = useAirQuality();
+  const { checkAndTriggerAutoAlert } = useAlerts();
+
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSavedLocationsOpen, setIsSavedLocationsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
     localStorage.getItem('breathe-theme') === 'dark' ? 'dark' : 'light'
@@ -44,6 +50,19 @@ const AppContent: React.FC = () => {
     document.documentElement.classList.toggle('theme-dark', theme === 'dark');
     localStorage.setItem('breathe-theme', theme);
   }, [theme]);
+
+  // Automated background threshold monitoring & email warning dispatch
+  useEffect(() => {
+    if (currentData) {
+      checkAndTriggerAutoAlert({
+        cityName: selectedLocation.name,
+        aqi: currentData.aqi,
+        category: currentData.category,
+        dominant: currentData.dominantPollutant,
+        pm25: currentData.pollutants?.pm2_5?.value
+      });
+    }
+  }, [currentData, selectedLocation.name, checkAndTriggerAutoAlert]);
 
   return (
     <div
@@ -58,6 +77,8 @@ const AppContent: React.FC = () => {
       <Navbar
         onOpenAiChat={() => setIsAiOpen(true)}
         onOpenAlertModal={() => setIsAlertOpen(true)}
+        onOpenNotifications={() => setIsNotificationsOpen(true)}
+        onOpenSavedLocations={() => setIsSavedLocationsOpen(true)}
         onOpenShareModal={() => setIsShareOpen(true)}
         theme={theme}
         onToggleTheme={() => setTheme(current => current === 'light' ? 'dark' : 'light')}
@@ -70,6 +91,7 @@ const AppContent: React.FC = () => {
             <HeroAqiCard
               onOpenAiChat={() => setIsAiOpen(true)}
               onOpenShareModal={() => setIsShareOpen(true)}
+              onOpenSavedLocations={() => setIsSavedLocationsOpen(true)}
             />
             <PollutantGrid />
             <WeatherCard />
@@ -121,6 +143,19 @@ const AppContent: React.FC = () => {
         <Suspense fallback={null}>
           <SmartAlertModal isOpen={isAlertOpen} onClose={() => setIsAlertOpen(false)} />
         </Suspense>
+      )}
+      {isSavedLocationsOpen && (
+        <SavedLocationsModal
+          isOpen={isSavedLocationsOpen}
+          onClose={() => setIsSavedLocationsOpen(false)}
+        />
+      )}
+      {isNotificationsOpen && (
+        <NotificationCenterModal
+          isOpen={isNotificationsOpen}
+          onClose={() => setIsNotificationsOpen(false)}
+          onOpenSettings={() => setIsAlertOpen(true)}
+        />
       )}
       {isShareOpen && (
         <ErrorBoundary>

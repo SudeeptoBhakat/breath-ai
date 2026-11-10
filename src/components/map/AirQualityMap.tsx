@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -121,7 +122,7 @@ export const AirQualityMap: React.FC = () => {
       setSampledLocation(loc);
       setSampledWaqi(waqiData);
     } catch (err) {
-      console.warn('Map sample error:', err);
+      logger.warn('Map sample error:', err);
     } finally {
       setIsSampling(false);
     }
@@ -399,3 +400,6 @@ export const AirQualityMap: React.FC = () => {
     </div>
   );
 };
+
+
+

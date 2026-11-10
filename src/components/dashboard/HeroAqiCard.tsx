@@ -12,7 +12,9 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
-  Activity
+  Activity,
+  Bookmark,
+  BookmarkCheck
 } from 'lucide-react';
 import { useAirQuality } from '../../context/AirQualityContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -21,6 +23,7 @@ import { formatDateTime } from '../../utils/formatters';
 interface HeroAqiCardProps {
   onOpenAiChat: () => void;
   onOpenShareModal: () => void;
+  onOpenSavedLocations?: () => void;
 }
 
 const getConditionVisual = (weatherCode: number, aqi: number) => {
@@ -48,8 +51,19 @@ const getConditionVisual = (weatherCode: number, aqi: number) => {
   };
 };
 
-export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenShareModal }) => {
-  const { selectedLocation, currentData, weatherData, isLoading, error, setActiveTab } = useAirQuality();
+export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenShareModal, onOpenSavedLocations }) => {
+  const { 
+    selectedLocation, 
+    setSelectedLocation, 
+    currentData, 
+    weatherData, 
+    isLoading, 
+    error, 
+    setActiveTab, 
+    favorites, 
+    isFavorite, 
+    toggleFavorite 
+  } = useAirQuality();
   const { t } = useLanguage();
 
   if (isLoading) {
@@ -139,16 +153,61 @@ export const HeroAqiCard: React.FC<HeroAqiCardProps> = ({ onOpenAiChat, onOpenSh
                 <span className="text-[10px] text-[#89938A] font-mono">({selectedLocation.countryCode})</span>
               </span>
 
+              <button
+                onClick={toggleFavorite}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white hover:bg-[#EEF1E8] border border-[#E3E6DC] text-[11px] font-heading transition-colors shadow-soft"
+                title={isFavorite ? 'Saved in your personal monitored cities' : 'Save this city'}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${isFavorite ? 'fill-[#8B5E3C] text-[#8B5E3C]' : 'text-[#89938A]'}`} />
+                <span className={isFavorite ? 'text-[#8B5E3C] font-semibold' : 'text-[#58645C]'}>
+                  {isFavorite ? 'Saved City' : 'Save City'}
+                </span>
+              </button>
+
               <span className="inline-flex items-center gap-1 text-[11px] text-[#89938A]">
                 <Clock className="w-3 h-3 text-[#A8B99A]" />
                 Updated {formatDateTime(lastUpdated)}
               </span>
-
-              {/* <span className="inline-flex items-center gap-1 text-[11px] text-[#89938A] hidden sm:inline-flex">
-                <ShieldCheck className="w-3 h-3 text-[#2D6A4F]" />
-                Source-aware monitoring
-              </span> */}
             </div>
+
+            {/* Quick Switch for Saved Locations */}
+            {favorites.length > 0 && (
+              <div className="flex items-center gap-1.5 pt-1 flex-wrap text-xs">
+                <span className="text-[10px] uppercase font-bold text-[#89938A] font-heading mr-1 flex items-center gap-1">
+                  <BookmarkCheck className="w-3 h-3 text-[#8B5E3C]" />
+                  <span>Saved:</span>
+                </span>
+                {favorites.slice(0, 4).map(fav => (
+                  <button
+                    key={fav.name}
+                    onClick={() => setSelectedLocation({
+                      id: fav.id,
+                      name: fav.name,
+                      displayName: fav.displayName,
+                      latitude: fav.latitude,
+                      longitude: fav.longitude,
+                      country: fav.country,
+                      countryCode: ''
+                    })}
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-heading font-medium border transition-colors ${
+                      selectedLocation.name.toLowerCase() === fav.name.toLowerCase()
+                        ? 'bg-[#173D32] text-white border-[#173D32] shadow-sm'
+                        : 'bg-white hover:bg-[#EEF1E8] text-[#173D32] border-[#E3E6DC]'
+                    }`}
+                  >
+                    {fav.name}
+                  </button>
+                ))}
+                {onOpenSavedLocations && (
+                  <button
+                    onClick={onOpenSavedLocations}
+                    className="text-[11px] font-semibold text-[#173D32] hover:underline font-heading ml-1"
+                  >
+                    View all ({favorites.length}) &rarr;
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* CTAs: Solid Forest Green CTA + Secondary Outline CTA */}
             <div className="flex flex-wrap items-center gap-3 pt-3">

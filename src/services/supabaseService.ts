@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { UserFavoriteLocation, UserAlertSetting, CommunityAirReport } from '../types/database';
+import { logger } from '../utils/logger';
 
 const SUPABASE_URL = (import.meta as any).env?.VITE_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = (import.meta as any).env?.VITE_SUPABASE_ANON_KEY || '';
@@ -39,7 +40,7 @@ export const databaseService = {
           }));
         }
       } catch (err) {
-        console.warn('Supabase fetch failed, falling back to localStorage:', err);
+        logger.warn('Supabase fetch failed, falling back to localStorage:', err);
       }
     }
 
@@ -70,7 +71,7 @@ export const databaseService = {
           country: item.country
         });
       } catch (err) {
-        console.warn('Supabase insert failed, saving locally:', err);
+        logger.warn('Supabase insert failed, saving locally:', err);
       }
     }
 
@@ -88,7 +89,7 @@ export const databaseService = {
           .delete()
           .match({ user_id: userId, city_name: name });
       } catch (err) {
-        console.warn('Supabase delete error:', err);
+        logger.warn('Supabase delete error:', err);
       }
     }
 
@@ -119,7 +120,7 @@ export const databaseService = {
           }));
         }
       } catch (err) {
-        console.warn('Supabase alerts fetch error:', err);
+        logger.warn('Supabase alerts fetch error:', err);
       }
     }
 
@@ -158,7 +159,7 @@ export const databaseService = {
           is_active: alert.isActive
         });
       } catch (err) {
-        console.warn('Supabase saveAlert error:', err);
+        logger.warn('Supabase saveAlert error:', err);
       }
     }
 
@@ -186,7 +187,7 @@ export const databaseService = {
           comments: report.comments
         });
       } catch (err) {
-        console.warn('Supabase community report insert error:', err);
+        logger.warn('Supabase community report insert error:', err);
       }
     }
 
@@ -218,7 +219,7 @@ export const databaseService = {
           }));
         }
       } catch (err) {
-        console.warn('Supabase reports fetch error:', err);
+        logger.warn('Supabase reports fetch error:', err);
       }
     }
 
@@ -231,3 +232,4 @@ export const databaseService = {
     }
   }
 };
+

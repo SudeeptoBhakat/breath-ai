@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { LocationData, CurrentAirQuality, HourlyReading, DailyPollutionTrend, PollutionSpike } from '../types/aqi';
 import { PRESET_CITIES, reverseGeocode } from '../services/geocodingService';
@@ -24,6 +25,7 @@ interface AirQualityContextType {
   favorites: UserFavoriteLocation[];
   isFavorite: boolean;
   toggleFavorite: () => Promise<void>;
+  removeFavorite: (name: string) => Promise<void>;
   locateMe: (silently?: boolean) => void;
   refreshData: () => Promise<void>;
   isLocating: boolean;
@@ -91,7 +93,7 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setDailyTrends(aqData.dailyTrends);
       setSpikes(aqData.spikes);
     } catch (err: unknown) {
-      console.error('Failed to load air quality data:', err);
+      logger.error('Failed to load air quality data:', err);
       const msg = err instanceof Error ? err.message : 'Failed to retrieve real-time air quality telemetry. Please check connection.';
       setError(msg);
     } finally {
@@ -124,13 +126,13 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           const loc = await reverseGeocode(lat, lon);
           setSelectedLocation(loc);
         } catch (e) {
-          console.error('Error reverse geocoding current location:', e);
+          logger.error('Error reverse geocoding current location:', e);
         } finally {
           setIsLocating(false);
         }
       },
       (err) => {
-        console.warn('Geolocation denied or failed:', err);
+        logger.warn('Geolocation denied or failed:', err);
         setIsLocating(false);
         if (!silently) alert('Could not access your location. Please ensure location permissions are enabled.');
       },
@@ -174,6 +176,11 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
 
+  const removeFavorite = async (name: string) => {
+    await databaseService.removeFavorite(name);
+    setFavorites(prev => prev.filter(f => f.name.toLowerCase() !== name.toLowerCase()));
+  };
+
   return (
     <AirQualityContext.Provider
       value={{
@@ -192,6 +199,7 @@ export const AirQualityProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         favorites,
         isFavorite,
         toggleFavorite,
+        removeFavorite,
         locateMe,
         refreshData,
         isLocating
@@ -209,3 +217,6 @@ export function useAirQuality() {
   }
   return context;
 }
+
+
+

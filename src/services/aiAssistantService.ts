@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { CurrentAirQuality, LocationData } from '../types/aqi';
 
 export interface ChatMessage {
@@ -411,7 +412,7 @@ export async function askBreatheAI(
       const geminiReply = await callGeminiDirect(userQuery, systemPrompt, chatHistory, geminiKey);
       if (geminiReply) return geminiReply;
     } catch (e) {
-      console.warn('Direct Gemini call failed, falling back to next provider:', e);
+      logger.warn('Direct Gemini call failed, falling back to next provider:', e);
     }
   }
 
@@ -422,7 +423,7 @@ export async function askBreatheAI(
       const groqReply = await callGroqDirect(userQuery, systemPrompt, chatHistory, groqKey);
       if (groqReply) return groqReply;
     } catch (e) {
-      console.warn('Direct Groq call failed, falling back to next provider:', e);
+      logger.warn('Direct Groq call failed, falling back to next provider:', e);
     }
   }
 
@@ -435,7 +436,7 @@ export async function askBreatheAI(
       const ollamaReply = await callOllamaDirect(userQuery, systemPrompt, chatHistory, ollamaKey, ollamaBase, ollamaModel);
       if (ollamaReply) return ollamaReply;
     } catch (e) {
-      console.warn('Direct Ollama call failed:', e);
+      logger.warn('Direct Ollama call failed:', e);
     }
   }
 
@@ -448,10 +449,13 @@ export async function askBreatheAI(
       const llamaReply = await callLlamaDirect(userQuery, systemPrompt, chatHistory, llamaKey, llamaBase, llamaModel);
       if (llamaReply) return llamaReply;
     } catch (e) {
-      console.warn('Direct Llama call failed:', e);
+      logger.warn('Direct Llama call failed:', e);
     }
   }
 
   // ── Strategy 5: High-Quality Contextual Offline Fallback ────────────────────
   return getOfflineFallback(userQuery, location, aqi, category, pm25, dominant, replyLanguage);
 }
+
+
+

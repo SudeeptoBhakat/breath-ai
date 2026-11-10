@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Sparkles, 
@@ -144,7 +145,7 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
       };
       setMessages(prev => [...prev, assistantMsg]);
     } catch (e) {
-      console.error('AI chat error:', e);
+      logger.error('AI chat error:', e);
     } finally {
       setIsTyping(false);
     }
@@ -162,7 +163,7 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
           handleSendMessage(transcript);
         },
         (err) => {
-          console.warn('Speech recognition error:', err);
+          logger.warn('Speech recognition error:', err);
           setIsListening(false);
         },
         () => setIsListening(false),
@@ -396,3 +397,6 @@ export const BreatheAiChat: React.FC<BreatheAiChatProps> = ({ isOpen, onClose })
     </div>
   );
 };
+
+
+

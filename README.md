@@ -36,8 +36,9 @@ BreatheAI is a **React + TypeScript** single-page application that delivers real
 | 🌤️ **Atmospheric Card** | Google Weather-style card with dynamic sky animations |
 | 🌍 **7 Languages** | English, Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati |
 | 📤 **Social Sharing** | 1200×630 PNG social card + WhatsApp, X, Facebook, Instagram, Email |
-| ⭐ **Saved Locations** | Supabase DB with localStorage offline fallback |
-| 🔔 **Smart Alerts** | AQI threshold alerts with configurable notifications |
+| ⭐ **Saved Locations** | Modal & drawer to view, inspect live AQI, switch, & remove saved cities |
+| 🔔 **Notification Center** | Dedicated notification panel with unread badge counter & alert history |
+| 📧 **SMTP Email Alerts** | Automated physician warning reports dispatched via serverless SMTP |
 | 🌙 **Dark / Light Theme** | Persisted theme with CSS custom properties |
 
 ---
@@ -65,6 +66,7 @@ src/
 │
 ├── services/
 │   ├── aiAssistantService.ts        # 6-tier AI cascade: proxy → Gemini → Groq → Ollama → Llama → offline
+│   ├── emailService.ts              # Client dispatcher for automated SMTP email alerts
 │   ├── openMeteoService.ts          # Open-Meteo Air Quality API + 5-min in-memory cache
 │   ├── weatherService.ts            # Open-Meteo Weather API (temperature, humidity, wind)
 │   ├── waqiService.ts               # WAQI station API + map tile URLs
@@ -75,14 +77,18 @@ src/
 │   └── speechService.ts            # Web Speech API TTS / STT wrapper
 │
 ├── utils/
+│   ├── alertEmailTemplate.ts        # Responsive HTML email template for automated warnings
 │   ├── aqiCalculator.ts             # AQI_CATEGORIES map, getAQICategory(), formatPollutant()
-│   └── formatters.ts                # formatTime(), formatDateShort(), calculatePercentageChange()
+│   ├── formatters.ts                # formatTime(), formatDateShort(), calculatePercentageChange()
+│   └── logger.ts                    # Production-safe logger that silences console output in prod
 │
 └── components/
     ├── layout/
     │   ├── Navbar.tsx               # Sticky header: search, tabs, language selector, theme toggle
     │   ├── Footer.tsx               # Atmospheric footer with i18n tagline
     │   ├── LanguageSelector.tsx     # Dropdown language picker with native script labels
+    │   ├── SavedLocationsModal.tsx  # Modal & manager for saved monitored cities with live AQI
+    │   ├── NotificationCenterModal.tsx # Centralized notification panel with unread badge counter
     │   ├── DiwaliBanner.tsx         # Seasonal notification banner (toggled in App.tsx)
     │   └── ErrorBoundary.tsx        # React class ErrorBoundary — prevents blank-screen crashes
     ├── dashboard/

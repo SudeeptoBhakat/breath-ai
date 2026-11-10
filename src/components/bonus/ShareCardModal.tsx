@@ -1,3 +1,4 @@
+import { logger } from '../../utils/logger';
 import React, { useState, useEffect } from 'react';
 import { 
   Share2, 
@@ -63,7 +64,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({ isOpen, onClose 
           if (isMounted) setCardImage(img);
         })
         .catch(err => {
-          console.warn('Canvas social card generation error:', err);
+          logger.warn('Canvas social card generation error:', err);
         })
         .finally(() => {
           if (isMounted) setIsGenerating(false);
@@ -155,7 +156,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({ isOpen, onClose 
           return;
         }
       } catch (e) {
-        console.warn('Native Instagram share error:', e);
+        logger.warn('Native Instagram share error:', e);
       }
     }
 
@@ -374,3 +375,6 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({ isOpen, onClose 
     </div>
   );
 };
+
+
+

@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger';
+
 export interface WaqiStationData {
   stationName: string;
   aqi: number;
@@ -62,7 +64,7 @@ export async function fetchWaqiStation(lat: number, lon: number): Promise<WaqiSt
       }
     };
   } catch (err) {
-    console.warn('WAQI station fetch error:', err);
+    logger.warn('WAQI station fetch error:', err);
     return null;
   }
 }
@@ -100,7 +102,7 @@ export async function fetchWaqiHere(): Promise<WaqiStationData | null> {
       }
     };
   } catch (err) {
-    console.warn('WAQI here fetch error:', err);
+    logger.warn('WAQI here fetch error:', err);
     return null;
   }
 }
